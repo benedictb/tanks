@@ -2,6 +2,7 @@
 # Ben Becker
 
 import pygame
+import terrain
 from pygame.locals import *
 
 class GameSpace():
@@ -15,7 +16,7 @@ class GameSpace():
         # init gameobjects
         self.clock = pygame.time.Clock()
         self.gameobjects = []
-        # self.gameobjects.append(tank())
+        self.gameobjects.append(terrain())
 
         pygame.key.set_repeat(1, 30)
 
@@ -43,18 +44,18 @@ class GameSpace():
                         pass
                         # fire cannon
 
+            #blank out screen
+            self.screen.fill(self.black)
+
             # call tick on each object
             for gameobject in self.gameobjects:
                 gameobject.tick()
 
             # update screen
-            self.screen.fill(self.black)
-            # blit tank
-            # blit projectiles
-            # blit explosions
-            # blit terrain
+            for gameobject in self.gameobjects:
+                pass
+                # self.screen.blit(gameobject.image, gameobject.rect)
             pygame.display.flip()
-
 
 if __name__ == '__main__':
     gs = GameSpace()
