@@ -1,8 +1,9 @@
+#! /usr/bin/python3
 # Thomas Franceschi
 # Ben Becker
 
 import pygame
-import terrain
+from terrain import *
 from pygame.locals import *
 
 class GameSpace():
@@ -16,7 +17,7 @@ class GameSpace():
         # init gameobjects
         self.clock = pygame.time.Clock()
         self.gameobjects = []
-        self.gameobjects.append(terrain())
+        self.gameobjects.append(Terrain(self))
 
         pygame.key.set_repeat(1, 30)
 
@@ -53,7 +54,7 @@ class GameSpace():
 
             # update screen
             for gameobject in self.gameobjects:
-                pass
+                gameobject.update()
                 # self.screen.blit(gameobject.image, gameobject.rect)
             pygame.display.flip()
 
