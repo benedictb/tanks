@@ -4,7 +4,7 @@ from explosion import Explosion
 from terrain import *
 import math
 GRAVITY = np.asarray([0, 0.1])
-EXPLOSION_SIZE = 9
+EXPLOSION_SIZE = 8*PIXEL_SIZE
 
 class MidBullet(pygame.sprite.Sprite):
     def __init__(self, gs, pos, angle, speed, wind):
@@ -25,15 +25,13 @@ class MidBullet(pygame.sprite.Sprite):
         self.wind = wind
         self.gs = gs
         self.explosiongif = 0
+        self.isFiring = True
 
     def tick(self):
-        # get height of ground at current x value
-        # ground = 595 - int(self.gs.terrain.heights[int((self.rect.centerx / PIXEL_SIZE + 5) % self.gs.width/5)] * 5)
-
         ground = self.gs.height - self.gs.get_height(self.rect.centerx)
 
         # if not hit anything, keep going
-        if self.gs.gmap[self.pos[0], self.gs.height - self.pos[1]] == 0:
+        if not self.hit_detect():
             acc = self.wind + GRAVITY
             self.vel[0] += acc[0]
             self.vel[1] += acc[1]
@@ -43,11 +41,31 @@ class MidBullet(pygame.sprite.Sprite):
             self.rect.center = self.pos
         # explode on contact
         else:
-            self.gs.gmap[self.pos[0] - EXPLOSION_SIZE*PIXEL_SIZE:self.pos[0]+EXPLOSION_SIZE*PIXEL_SIZE, self.gs.height - self.pos[1] - EXPLOSION_SIZE*PIXEL_SIZE:self.gs.height - self.pos[1]+EXPLOSION_SIZE*PIXEL_SIZE] = 0
+            self.gs.gmap[self.pos[0] - EXPLOSION_SIZE:self.pos[0]+EXPLOSION_SIZE, self.gs.height - self.pos[1] - EXPLOSION_SIZE:self.gs.height - self.pos[1]+EXPLOSION_SIZE] = 0
             self.gs.terrain.create_surface()
             self.gs.gameobjects.append(Explosion(self.gs, self.pos))
             self.gs.gameobjects.remove(self)
 
+    def hit_detect(self):
+        # if bullet is above screen, definitely no hit
+        if self.pos[1] <= 0 or self.pos[1] >= 600:
+            return 0
+        # if bullet hits player 2, hit
+        elif pygame.sprite.collide_rect(self, self.gs.gameobjects[2]) and self.isFiring:
+            print("HIT")
+            self.isFiring = False
+            self.gs.gameobjects[2].health -= 50
+            print("enemy health: " + str(self.gs.gameobjects[2].health))
+            return 1
+        elif pygame.sprite.collide_rect(self, self.gs.gameobjects[2]):
+            return 1
+        # if bullet hits ground, hit detect
+        elif self.gs.gmap[self.pos[0], self.gs.height - self.pos[1]] != 0:
+            self.isFiring = False
+            return 1
+        # if bullets hits nothing, no hit detect
+        else:
+            return 0
 
     def update(self):
         self.gs.screen.blit(self.image, self.rect)
