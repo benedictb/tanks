@@ -9,7 +9,7 @@ class MidBullet(pygame.sprite.Sprite):
     def __init__(self, gs, pos, angle, speed, wind):
         super().__init__()
         self.pos = np.asarray(pos)
-        self.image = pygame.image.load('mid_bullet.png')
+        self.image = pygame.image.load('media/mid_bullet.png')
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
         # get angle of trajectory
@@ -27,7 +27,7 @@ class MidBullet(pygame.sprite.Sprite):
 
     def tick(self):
         # get height of ground at current x value
-        ground = 595 - int(self.gs.terrain.heights[int((self.rect.centerx / PIXEL_SIZE + 5) % 199)] * 5)
+        ground = 595 - int(self.gs.terrain.heights[int((self.rect.centerx / PIXEL_SIZE + 5) % self.gs.width/5)] * 5)
 
 
         # if not hit anything, keep going
@@ -37,7 +37,7 @@ class MidBullet(pygame.sprite.Sprite):
             self.vel[1] += acc[1]
             self.pos[0] += self.vel[0]
             self.pos[1] += self.vel[1]
-            self.pos[0] = self.pos[0] % 1000
+            self.pos[0] = self.pos[0] % self.gs.width
             self.rect.center = self.pos
         # explode on contact
         elif self.explosiongif < 17:

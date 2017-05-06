@@ -7,7 +7,7 @@ class MidTank(pygame.sprite.Sprite):
     def __init__(self, gs, pos):
         super().__init__()
         self.pos = np.asarray(pos)
-        self.image = pygame.image.load('mid_tank.png')
+        self.image = pygame.image.load('media/mid_tank.png')
         self.rect = self.image.get_rect()
         self.rect.centerx = pos[0]
         self.gs = gs
@@ -24,8 +24,8 @@ class MidTank(pygame.sprite.Sprite):
         #    self.vel = ([0, 0])
         self.vel += self.acc
         self.pos += self.vel
-        self.pos[0] = self.pos[0] % 1000
-        self.pos[1] = 555 - int(self.gs.terrain.heights[int((self.rect.centerx / PIXEL_SIZE + 5) % 199)] * 5)
+        self.pos[0] = self.pos[0] % self.gs.width
+        self.pos[1] = 555 - int(self.gs.terrain.heights[int((self.rect.centerx / PIXEL_SIZE + 5) % 350 )] * 5)
         self.rect.center = self.pos
         if self.health <= 0:
             print("GAME OVER")
@@ -35,4 +35,10 @@ class MidTank(pygame.sprite.Sprite):
 
 
     def update(self):
-        self.gs.screen.blit(self.image, self.rect.center)
+        m = pygame.mouse.get_pos()
+
+        if m[0] > self.pos[0]:
+            rev = pygame.transform.flip(self.image, True, False)
+            self.gs.screen.blit(rev, self.rect.center)
+        else:
+            self.gs.screen.blit(self.image, self.rect.center)
