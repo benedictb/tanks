@@ -11,9 +11,18 @@ from pygame.locals import *
 class GameSpace():
 
     def get_height(self, x):
-        x =  x % self.width
-        col = [1 for i in self.gmap[x,:] if i]
-        return sum(col)
+        x = x % self.width
+        col =  [1 if i else 0 for i in self.gmap[x,:] ]
+        # print(col)
+        # h = 1
+        for i in range(0, self.height):
+            # print(i)
+            if not col[i]:
+                return i
+        return 1
+
+        # col = [1 for i in self.gmap[x,:] if i]
+        # return sum(col)
 
     def main(self):
         # init gamespace
