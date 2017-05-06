@@ -1,9 +1,10 @@
 import pygame
 import numpy as np
+from explosion import Explosion
 from terrain import *
 import math
 GRAVITY = np.asarray([0, 0.1])
-
+EXPLOSION_SIZE = 9
 
 class MidBullet(pygame.sprite.Sprite):
     def __init__(self, gs, pos, angle, speed, wind):
@@ -41,17 +42,12 @@ class MidBullet(pygame.sprite.Sprite):
             self.pos[0] = self.pos[0] % self.gs.width
             self.rect.center = self.pos
         # explode on contact
-        elif self.explosiongif < 17:
-            if self.explosiongif < 10:
-                self.image = pygame.image.load('explosion/frames00' + str(self.explosiongif) + 'a.png')
-            else:
-                self.image = pygame.image.load('explosion/frames0' + str(self.explosiongif) + 'a.png')
-            self.explosiongif += 1
-        # remove from game when explosion is over
         else:
-            self.gs.gmap[self.pos[0] - 2*PIXEL_SIZE:self.pos[0]+2*PIXEL_SIZE, self.gs.height - self.pos[1] - 2*PIXEL_SIZE:self.gs.height - self.pos[1]+2*PIXEL_SIZE] = 0
+            self.gs.gmap[self.pos[0] - EXPLOSION_SIZE*PIXEL_SIZE:self.pos[0]+EXPLOSION_SIZE*PIXEL_SIZE, self.gs.height - self.pos[1] - EXPLOSION_SIZE*PIXEL_SIZE:self.gs.height - self.pos[1]+EXPLOSION_SIZE*PIXEL_SIZE] = 0
             self.gs.terrain.create_surface()
+            self.gs.gameobjects.append(Explosion(self.gs, self.pos))
             self.gs.gameobjects.remove(self)
+
 
     def update(self):
         self.gs.screen.blit(self.image, self.rect)
