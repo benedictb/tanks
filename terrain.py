@@ -3,6 +3,7 @@
 import pygame
 import numpy as np
 import random
+import time
 PIXEL_SIZE = 5
 ROCK_LEVEL = 5
 PARALLAX = 2
@@ -15,12 +16,15 @@ class Terrain(pygame.sprite.Sprite):
         self.screenHeight = gs.height
         self.screenWidth = gs.width
         self.heights = [10] * int(self.screenWidth / PIXEL_SIZE)
+        image = pygame.Surface((self.screenWidth, self.screenHeight), pygame.SRCALPHA, 32)
+        self.image = image.convert_alpha()
 
         # These are the colors for the different types of tile. Changeable
         self.dirt = (117, 76, 16)
         self.rock = (141, 155, 141)
         self.grass = (48, 219, 48)
         self.gen_terrain()
+        self.create_surface()
 
         # print(self.heights)
 
@@ -28,14 +32,27 @@ class Terrain(pygame.sprite.Sprite):
         pass
 
     # IF the cell is valid (cell[0] == True), then draw it. gmap is a matrix representing the gamespace
-    def update(self):
-        for i in range(0, len(self.gs.gmap)):
-            for j in range (0, len(self.gs.gmap[i])):
+    def create_surface(self):
+        start = time.time()
+        end = time.time()
+        for i in range(0, len(self.gs.gmap),5):
+            for j in range (0, len(self.gs.gmap[i]),5):
                 cell = self.gs.gmap[i,j]
-                if cell[0]:
-                    self.gs.screen.fill(cell[1:], ((i * PIXEL_SIZE, self.screenHeight - j * PIXEL_SIZE), (PIXEL_SIZE, PIXEL_SIZE)))
+                if cell == 1:
+                    # self.gs.screen.set_at((i,self.screenHeight-j), self.rock)
+                    self.image.fill(self.rock, ((i, self.screenHeight - j), (PIXEL_SIZE, PIXEL_SIZE)))
+                elif cell == 2:
+                    self.image.fill(self.dirt, ((i, self.screenHeight - j), (PIXEL_SIZE, PIXEL_SIZE)))
+                    # self.gs.screen.set_at((i,self.screenHeight-j), self.dirt)
+                elif cell == 3:
+                    self.image.fill(self.grass, ((i, self.screenHeight - j), (PIXEL_SIZE, PIXEL_SIZE)))
+                    # self.gs.screen.set_at((i,self.screenHeight-j), self.grass)
+        self.image.set_alpha(150)
+        end = time.time()
+        print(end - start)
 
-
+    def update(self):
+        self.gs.screen.blit(self.image, self.image.get_rect())
 
 
     def gen_terrain(self):
@@ -63,22 +80,26 @@ class Terrain(pygame.sprite.Sprite):
             self.heights = np.floor_divide(np.asarray(self.heights, dtype=int), PIXEL_SIZE)
 
             # This is a map of the tiles
-            gmap = np.zeros((length, height, 4))
+            gmap = np.zeros((self.screenWidth, self.screenHeight, 1))
 
             # The next loops define which sort of tile they are (what color)
             for i, h in enumerate(self.heights):
+                i = i*5
 
                 for j in range(ROCK_LEVEL,h):
-                    gmap[i,j,0] = 1
-                    gmap[i,j,1:] = self.dirt
+                    j = j*PIXEL_SIZE
+                    # gmap[i,j,0] = 1
+                    gmap[i:i+PIXEL_SIZE,j:j+PIXEL_SIZE] = 2 #self.dirt
 
                 for j in range(0, ROCK_LEVEL + random.randint(0, 2)):
-                    gmap[i,j,0] = 1
-                    gmap[i,j,1:] = self.rock
+                    j = j*PIXEL_SIZE
+                    # gmap[i,j,0] = 1
+                    gmap[i:i+PIXEL_SIZE, j:j+PIXEL_SIZE] = 1 #self.rock
 
                 for j in range(h - ROCK_LEVEL, h):
-                    gmap[i,j,0] = 1
-                    gmap[i,j,1:] = self.grass
+                    j = j*PIXEL_SIZE
+                    # gmap[i,j,0] = 1
+                    gmap[i:i+PIXEL_SIZE, j:j+PIXEL_SIZE] = 3 #self.grass
 
             self.gs.gmap = gmap
         except IndexError:

@@ -2,7 +2,7 @@ import pygame
 import numpy as np
 from terrain import *
 import math
-GRAVITY = np.asarray([0, 0.75])
+GRAVITY = np.asarray([0, 0.1])
 
 
 class MidBullet(pygame.sprite.Sprite):
@@ -27,8 +27,9 @@ class MidBullet(pygame.sprite.Sprite):
 
     def tick(self):
         # get height of ground at current x value
-        ground = 595 - int(self.gs.terrain.heights[int((self.rect.centerx / PIXEL_SIZE + 5) % self.gs.width/5)] * 5)
+        # ground = 595 - int(self.gs.terrain.heights[int((self.rect.centerx / PIXEL_SIZE + 5) % self.gs.width/5)] * 5)
 
+        ground = self.gs.height - self.gs.get_height(self.rect.centerx)
 
         # if not hit anything, keep going
         if self.pos[1] <= ground:

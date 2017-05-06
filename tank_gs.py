@@ -9,6 +9,12 @@ from mid_bullet import *
 from pygame.locals import *
 
 class GameSpace():
+
+    def get_height(self, x):
+        x =  x % self.width
+        col = [1 for i in self.gmap[x,:] if i]
+        return sum(col)
+
     def main(self):
         # init gamespace
         pygame.init()
@@ -49,7 +55,8 @@ class GameSpace():
                     if mouse[0]:
                         print("fire")
                         pos = self.gameobjects[1].get_pos()
-                        self.gameobjects.append(MidBullet(self, pos, 0, 25, 0))
+                        # pos[0]+=5; pos[1]+=5
+                        self.gameobjects.append(MidBullet(self, pos, 0, 10, 0))
                         # fire cannon
 
             #blank out screen
