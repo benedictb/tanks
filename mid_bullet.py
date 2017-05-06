@@ -19,7 +19,7 @@ class MidBullet(pygame.sprite.Sprite):
         self.velx = speed * math.cos(math.radians(360 - self.angle))
         self.vely = speed * math.sin(math.radians(360 - self.angle))
         self.vel = np.asarray([self.velx, self.vely])
-        print("velx: " + str(self.velx) + " vely: " + str(self.vely))
+        #print("velx: " + str(self.velx) + " vely: " + str(self.vely))
         # self.vel = np.asarray([np.cos(self.angle)*speed, np.sin(self.angle)*speed], dtype='float32')
         self.wind = wind
         self.gs = gs
@@ -32,7 +32,7 @@ class MidBullet(pygame.sprite.Sprite):
         ground = self.gs.height - self.gs.get_height(self.rect.centerx)
 
         # if not hit anything, keep going
-        if self.pos[1] <= ground:
+        if self.gs.gmap[self.pos[0], self.gs.height - self.pos[1]] == 0:
             acc = self.wind + GRAVITY
             self.vel[0] += acc[0]
             self.vel[1] += acc[1]
@@ -49,6 +49,8 @@ class MidBullet(pygame.sprite.Sprite):
             self.explosiongif += 1
         # remove from game when explosion is over
         else:
+            self.gs.gmap[self.pos[0] - 2*PIXEL_SIZE:self.pos[0]+2*PIXEL_SIZE, self.gs.height - self.pos[1] - 2*PIXEL_SIZE:self.gs.height - self.pos[1]+2*PIXEL_SIZE] = 0
+            self.gs.terrain.create_surface()
             self.gs.gameobjects.remove(self)
 
     def update(self):
