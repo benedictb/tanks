@@ -18,8 +18,8 @@ class Explosion(pygame.sprite.Sprite):
         if self.timer >= 28:
             self.gs.gameobjects.remove(self)
         else:
-            # img = pygame.image.load('./media/ezgif-2-fa08374492-gif-png/frame_{}_delay-0.06s.png'.format(int(self.timer / 2)))
-            img = pygame.image.load('./media/ezgif-2-fa08374492-gif-png/frame_0_delay-0.06s.png'.format(int(self.timer / 2)))
+            img = pygame.image.load('./media/exp/{}.png'.format(int(self.timer / 2)))
+            # img = pygame.image.load('./media/ezgif-2-fa08374492-gif-png/0.png'.format(int(self.timer / 2)))
             img = img.convert_alpha()
             self.gs.screen.blit(img,self.pos)
         # if self.timer <= 0:

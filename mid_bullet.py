@@ -48,8 +48,10 @@ class MidBullet(pygame.sprite.Sprite):
 
     def hit_detect(self):
         # if bullet is above screen, definitely no hit
-        if self.pos[1] <= 0 or self.pos[1] >= 600:
+        if self.pos[1] <= 0:
             return 0
+        elif self.pos[1] >= 600:
+            self.gs.gameobjects.remove(self)
         # if bullet hits player 2, hit
         elif pygame.sprite.collide_rect(self, self.gs.gameobjects[2]) and self.isFiring:
             print("HIT")
