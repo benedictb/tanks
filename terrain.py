@@ -4,7 +4,7 @@ import pygame
 import numpy as np
 import random
 PIXEL_SIZE = 5
-ROCK_LEVEL = 3
+ROCK_LEVEL = 5
 
 # Not sure if this is a sprite..
 class Terrain(pygame.sprite.Sprite):
@@ -25,9 +25,9 @@ class Terrain(pygame.sprite.Sprite):
         pass
 
     def update(self):
-        for i in range(0, len(self.gmap)):
-            for j in range (0, len(self.gmap[i])):
-                cell = self.gmap[i,j]
+        for i in range(0, len(self.gs.gmap)):
+            for j in range (0, len(self.gs.gmap[i])):
+                cell = self.gs.gmap[i,j]
                 if cell[0]:
                     self.gs.screen.fill(cell[1:], ((i * PIXEL_SIZE, self.screenHeight - j * PIXEL_SIZE), (PIXEL_SIZE, PIXEL_SIZE)))
 
@@ -69,6 +69,6 @@ class Terrain(pygame.sprite.Sprite):
                 gmap[i,j,0] = 1
                 gmap[i,j,1:] = self.grass
 
-        self.gmap = gmap
+        self.gs.gmap = gmap
 
 
