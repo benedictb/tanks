@@ -15,6 +15,8 @@ class Terrain(pygame.sprite.Sprite):
         self.screenHeight = gs.height
         self.screenWidth = gs.width
         self.heights = [10] * int(self.screenWidth / PIXEL_SIZE)
+
+        # These are the colors for the different types of tile. Changeable
         self.dirt = (117, 76, 16)
         self.rock = (141, 155, 141)
         self.grass = (48, 219, 48)
@@ -25,6 +27,7 @@ class Terrain(pygame.sprite.Sprite):
     def tick(self):
         pass
 
+    # IF the cell is valid (cell[0] == True), then draw it. gmap is a matrix representing the gamespace
     def update(self):
         for i in range(0, len(self.gs.gmap)):
             for j in range (0, len(self.gs.gmap[i])):
@@ -37,11 +40,14 @@ class Terrain(pygame.sprite.Sprite):
 
     def gen_terrain(self):
         try:
-            self.heights[0] = 100
+            # Try generating a map, if it doesn't fit, try again (should'nt happen more than once
+            self.heights[0] = 100 # Left and right start the same way
             self.heights[-1] = 100
             length = int(self.screenWidth / PIXEL_SIZE)
             height = int(self.screenHeight / PIXEL_SIZE)
             mid = int(length/2)
+
+            # Generate the graph with a random step, with a higher probabability of going up in the middle
             for i in range(1,mid):
                 prev = self.heights[i-1]
                 addition = random.uniform(-8,13)
@@ -52,11 +58,14 @@ class Terrain(pygame.sprite.Sprite):
                 addition = random.uniform(-8,13)
                 self.heights[j] = int(addition+prev)
 
+            # Make a adjustment in the middle in case there's a gap. This could be better
             self.heights[mid] = int((self.heights[mid+1] + self.heights[mid-1]) / 2)
             self.heights = np.floor_divide(np.asarray(self.heights, dtype=int), PIXEL_SIZE)
 
+            # This is a map of the tiles
             gmap = np.zeros((length, height, 4))
 
+            # The next loops define which sort of tile they are (what color)
             for i, h in enumerate(self.heights):
 
                 for j in range(ROCK_LEVEL,h):
@@ -76,12 +85,14 @@ class Terrain(pygame.sprite.Sprite):
             self.gen_terrain()
 
 
-
+# This is a messy class for the moving background
 class Background(pygame.sprite.Sprite):
     def __init__(self, gs):
         pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
         self.screenHeight = gs.height
         self.screenWidth = gs.width
+
+        # I needed 4 rectangles to make it work, up to three are displayed at once on the screen
         self.image = pygame.image.load('./media/bg.jpg')
         self.rimage = pygame.image.load('./media/bg_reverse.jpg')
         self.rect = self.image.get_rect()
@@ -107,6 +118,7 @@ class Background(pygame.sprite.Sprite):
     def tick(self):
         pass
 
+    # The parallax global defines how much it shifts
     def shift_left(self):
         for r in self.rects:
             r.left += PARALLAX
@@ -119,8 +131,8 @@ class Background(pygame.sprite.Sprite):
 
         self.check_bounds()
 
+    # this functino makes sure we haven't run out of background
     def check_bounds(self):
-
         # examine later
         if self.rect.left >= 0:
             for r in self.rects:
@@ -130,6 +142,7 @@ class Background(pygame.sprite.Sprite):
             for r in self.rects:
                 r.left += 2 * self.size[0]
 
+    # Update just writes each of the pictures
     def update(self):
         self.gs.screen.blit(self.image, self.rect)
         self.gs.screen.blit(self.rimage, self.rrect)

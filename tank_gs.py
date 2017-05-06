@@ -19,8 +19,9 @@ class GameSpace():
         # init gameobjects
         self.clock = pygame.time.Clock()
         self.bg = Background(self)
+        self.terrain = Terrain(gs)
         self.gameobjects = []
-        self.gameobjects.append(Terrain(self))
+        self.gameobjects.append(self.terrain)
         self.gameobjects.append(MidTank(self, ([0, 300])))
 
         pygame.key.set_repeat(1, 30)
