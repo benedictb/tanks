@@ -11,7 +11,7 @@ from pygame.locals import *
 class GameSpace():
 
     def get_height(self, x):
-        x =  x % self.width
+        x = x % self.width
         col = [1 for i in self.gmap[x,:] if i]
         return sum(col)
 
@@ -29,6 +29,7 @@ class GameSpace():
         self.gameobjects = []
         self.gameobjects.append(self.terrain)
         self.gameobjects.append(MidTank(self, ([0, 300])))
+        self.gameobjects.append(MidTank(self, ([500, 600])))
 
         pygame.key.set_repeat(1, 30)
 
@@ -42,7 +43,7 @@ class GameSpace():
                 if event.type == KEYDOWN:
                     keys = pygame.key.get_pressed()
                     if keys[K_w]:
-                        print("jump!")
+                        #print("jump!")
                         self.gameobjects[1].pos[1] -= 50
                     if keys[K_a]:
                         self.gameobjects[1].pos[0] -= 4
@@ -53,7 +54,7 @@ class GameSpace():
                 if event.type == MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pressed()
                     if mouse[0]:
-                        print("fire")
+                        #print("fire")
                         pos = self.gameobjects[1].get_pos()
                         # pos[0]+=5; pos[1]+=5
                         self.gameobjects.append(MidBullet(self, pos, 0, 10, 0))
