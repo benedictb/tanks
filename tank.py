@@ -14,6 +14,7 @@ class MidTank(pygame.sprite.Sprite):
         self.vel = np.asarray([0, 0])
         self.acc = GRAVITY
         self.health = 1000
+        print(self.rect.size)
 
     def tick(self):
         #if self.rect.centery <= 300:
@@ -34,6 +35,7 @@ class MidTank(pygame.sprite.Sprite):
         # self.pos[1] = 555 - int(self.gs.terrain.heights[int((self.rect.centerx / PIXEL_SIZE + 5) % 350 )] * 5)
         self.rect.center = self.pos
         if self.health <= 0:
+            pass
             #print("GAME OVER")
 
 

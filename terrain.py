@@ -6,9 +6,8 @@ import random
 import time
 PIXEL_SIZE = 5
 ROCK_LEVEL = 5
-PARALLAX = 2
 
-# Not sure if this is a sprite..
+
 class Terrain(pygame.sprite.Sprite):
     def __init__(self, gs):
         super().__init__()
@@ -24,18 +23,16 @@ class Terrain(pygame.sprite.Sprite):
         self.rock = (141, 155, 141, 255)
         self.grass = (48, 219, 48, 255)
         self.black = (0, 0, 0, 0)
+
+        # Create the terrain
         self.gen_terrain()
         self.create_surface()
-
-        # print(self.heights)
 
     def tick(self):
         pass
 
-    # IF the cell is valid (cell[0] == True), then draw it. gmap is a matrix representing the gamespace
+    # IF the cell is valid (cell[0] == True), THEN draw it. gmap is a matrix representing the gamespace
     def create_surface(self):
-        start = time.time()
-        end = time.time()
         for i in range(0, len(self.gs.gmap),5):
             for j in range (0, len(self.gs.gmap[i]),5):
                 cell = self.gs.gmap[i,j]
@@ -51,12 +48,9 @@ class Terrain(pygame.sprite.Sprite):
                 elif cell == 0:
                     self.image.fill(self.black, ((i, self.screenHeight - j), (PIXEL_SIZE, PIXEL_SIZE)))
         self.image.set_alpha(150)
-        end = time.time()
-        print(end - start)
 
     def update(self):
         self.gs.screen.blit(self.image, self.image.get_rect())
-
 
     def gen_terrain(self):
         try:
@@ -108,67 +102,8 @@ class Terrain(pygame.sprite.Sprite):
         except IndexError:
             self.gen_terrain()
 
+    def remove_blocks(self, x1, x2, y1, y2):
+        self.image.fill(self.black, ((x1, y1), (x2-x1,y2-y1)))
+        self.image.set_alpha(0)
 
-# This is a messy class for the moving background
-class Background(pygame.sprite.Sprite):
-    def __init__(self, gs):
-        pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
-        self.screenHeight = gs.height
-        self.screenWidth = gs.width
 
-        # I needed 4 rectangles to make it work, up to three are displayed at once on the screen
-        self.image = pygame.image.load('./media/bg.jpg')
-        self.rimage = pygame.image.load('./media/bg_reverse.jpg')
-        self.rect = self.image.get_rect()
-        self.rrect = self.rimage.get_rect()
-
-        self.bimage = pygame.image.load('./media/bg.jpg')
-        self.brimage = pygame.image.load('./media/bg_reverse.jpg')
-        self.brect = self.image.get_rect()
-        self.brrect = self.rimage.get_rect()
-
-        self.size = self.rect.size
-
-        self.rect.left, self.rect.top = (0,0)
-        self.rrect.left, self.rrect.top = (0+self.size[0],0)
-
-        self.brect.left, self.rect.top = (0 + 2 * self.size[0] ,0)
-        self.brrect.left, self.rrect.top = (0 + 3* self.size[0], 0)
-
-        self.rects = [self.rect, self.rrect, self.brect, self.brrect]
-
-        self.gs = gs
-
-    def tick(self):
-        pass
-
-    # The parallax global defines how much it shifts
-    def shift_left(self):
-        for r in self.rects:
-            r.left += PARALLAX
-
-        self.check_bounds()
-
-    def shift_right(self):
-        for r in self.rects:
-            r.left -= PARALLAX
-
-        self.check_bounds()
-
-    # this functino makes sure we haven't run out of background
-    def check_bounds(self):
-        # examine later
-        if self.rect.left >= 0:
-            for r in self.rects:
-                r.left -= 2 * self.size[0]
-
-        elif self.brrect.left <= self.screenWidth - self.size[0]:
-            for r in self.rects:
-                r.left += 2 * self.size[0]
-
-    # Update just writes each of the pictures
-    def update(self):
-        self.gs.screen.blit(self.image, self.rect)
-        self.gs.screen.blit(self.rimage, self.rrect)
-        self.gs.screen.blit(self.bimage, self.brect)
-        self.gs.screen.blit(self.brimage, self.brrect)

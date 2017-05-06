@@ -1,5 +1,6 @@
 import pygame
 
+
 class Explosion(pygame.sprite.Sprite):
     def __init__(self,gs, pos):
         super().__init__()

@@ -2,10 +2,11 @@
 # Thomas Franceschi
 # Ben Becker
 
-
-from terrain import *
-from tank import *
-from mid_bullet import *
+import pygame
+from terrain import Terrain
+from tank import MidTank
+from mid_bullet import MidBullet
+from background import Background
 from pygame.locals import *
 
 class GameSpace():
@@ -24,6 +25,8 @@ class GameSpace():
         # col = [1 for i in self.gmap[x,:] if i]
         # return sum(col)
 
+    def remove_from_gmap(self,x1,x2,y1,y2):
+        self.gmap[x1:x2,y1:y2] = 0
 
     def main(self):
         # init gamespace
