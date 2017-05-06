@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+from terrain import *
 import math
 GRAVITY = np.asarray([0, 0.75])
 
@@ -25,14 +26,16 @@ class MidBullet(pygame.sprite.Sprite):
         self.gs = gs
 
     def tick(self):
-        acc = self.wind + GRAVITY
-        self.vel[0] += acc[0]
-        self.vel[1] += acc[1]
-        self.pos[0] += self.vel[0]
-        self.pos[1] += self.vel[1]
-        #self.rect.move(self.velx, self.vely)
-        #self.pos[0] = self.pos[0] % 1000
-        self.rect.center = self.pos
+        ground = 595 - int(self.gs.gameobjects[0].heights[(self.rect.centerx / PIXEL_SIZE + 5) % 199] * 5)
+        if self.pos[1] <= ground:
+            acc = self.wind + GRAVITY
+            self.vel[0] += acc[0]
+            self.vel[1] += acc[1]
+            self.pos[0] += self.vel[0]
+            self.pos[1] += self.vel[1]
+            #self.rect.move(self.velx, self.vely)
+            self.pos[0] = self.pos[0] % 1000
+            self.rect.center = self.pos
 
     def update(self):
         self.gs.screen.blit(self.image, self.rect)
