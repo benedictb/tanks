@@ -20,10 +20,10 @@ class Terrain(pygame.sprite.Sprite):
         self.image = image.convert_alpha()
 
         # These are the colors for the different types of tile. Changeable
-        self.dirt = (117, 76, 16)
-        self.rock = (141, 155, 141)
-        self.grass = (48, 219, 48)
-        self.black = (0, 0, 0)
+        self.dirt = (117, 76, 16, 255)
+        self.rock = (141, 155, 141, 255)
+        self.grass = (48, 219, 48, 255)
+        self.black = (0, 0, 0, 0)
         self.gen_terrain()
         self.create_surface()
 
