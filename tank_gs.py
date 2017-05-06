@@ -12,12 +12,13 @@ class GameSpace():
     def main(self):
         # init gamespace
         pygame.init()
-        self.size = self.width, self.height = 1000, 600
+        self.size = self.width, self.height = 1750, 600
         self.black = 0, 0, 0
         self.screen = pygame.display.set_mode(self.size)
 
         # init gameobjects
         self.clock = pygame.time.Clock()
+        self.bg = Background(self)
         self.gameobjects = []
         self.gameobjects.append(Terrain(self))
         self.gameobjects.append(MidTank(self, ([0, 300])))
@@ -38,8 +39,10 @@ class GameSpace():
                         self.gameobjects[1].pos[1] -= 50
                     if keys[K_a]:
                         self.gameobjects[1].pos[0] -= 4
+                        self.bg.shift_left()
                     if keys[K_d]:
                         self.gameobjects[1].pos[0] += 4
+                        self.bg.shift_right()
                 if event.type == MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pressed()
                     if mouse[0]:
@@ -56,9 +59,10 @@ class GameSpace():
                 gameobject.tick()
 
             # update screen
+            self.bg.update()
             for gameobject in self.gameobjects:
                 gameobject.update()
-                # self.screen.blit(gameobject.image, gameobject.rect)
+
             pygame.display.flip()
 
 if __name__ == '__main__':

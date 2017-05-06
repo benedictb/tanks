@@ -25,7 +25,7 @@ class MidTank(pygame.sprite.Sprite):
         self.vel += self.acc
         self.pos += self.vel
         self.pos[0] = self.pos[0] % 1000
-        self.pos[1] = 555 - int(self.gs.gameobjects[0].heights[(self.rect.centerx / PIXEL_SIZE + 5) % 199] * 5)
+        self.pos[1] = 555 - int(self.gs.gameobjects[0].heights[int((self.rect.centerx / PIXEL_SIZE + 5) % 199)] * 5)
         self.rect.center = self.pos
         if self.health <= 0:
             print("GAME OVER")
