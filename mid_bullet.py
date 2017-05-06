@@ -27,7 +27,9 @@ class MidBullet(pygame.sprite.Sprite):
 
     def tick(self):
         # get height of ground at current x value
-        ground = 595 - int(self.gs.gameobjects[0].heights[int((self.rect.centerx / PIXEL_SIZE + 5) % 199)] * 5)
+        ground = 595 - int(self.gs.terrain.heights[int((self.rect.centerx / PIXEL_SIZE + 5) % 199)] * 5)
+
+
         # if not hit anything, keep going
         if self.pos[1] <= ground:
             acc = self.wind + GRAVITY
