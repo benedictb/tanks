@@ -23,6 +23,7 @@ class Terrain(pygame.sprite.Sprite):
         self.dirt = (117, 76, 16)
         self.rock = (141, 155, 141)
         self.grass = (48, 219, 48)
+        self.black = (0, 0, 0)
         self.gen_terrain()
         self.create_surface()
 
@@ -47,6 +48,8 @@ class Terrain(pygame.sprite.Sprite):
                 elif cell == 3:
                     self.image.fill(self.grass, ((i, self.screenHeight - j), (PIXEL_SIZE, PIXEL_SIZE)))
                     # self.gs.screen.set_at((i,self.screenHeight-j), self.grass)
+                elif cell == 0:
+                    self.image.fill(self.black, ((i, self.screenHeight - j), (PIXEL_SIZE, PIXEL_SIZE)))
         self.image.set_alpha(150)
         end = time.time()
         print(end - start)
