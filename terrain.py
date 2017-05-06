@@ -1,50 +1,61 @@
+#! /usr/bin/python3
+
 import pygame
 import numpy as np
-import random.uniform
-SQUARE_SIDE = 100
+import random
+SQUARE_SIDE = 5
+ROCK_LEVEL = 20
 
 # Not sure if this is a sprite..
 class Terrain(pygame.sprite.Sprite):
     def __init__(self, gs):
         super().__init__()
         self.gs = gs
-        self.generate_terrain()
+        self.screenHeight = gs.height
+        self.screenWidth = gs.width
+        self.heights = [10] * int(self.screenWidth/SQUARE_SIDE)
+        self.gen_terrain()
         self.dirt = (117, 76, 16)
         self.rock = (141, 155, 141)
         self.grass = (48, 219, 48)
-        self.screenHeight = gs.height
-        self.screenWidth = gs.width
-        self.heights = [10] * screenWidth
-
+        # print(self.heights)
 
     def tick(self):
         pass
 
     def update(self):
         for i, h in enumerate(self.heights):
+            i*= SQUARE_SIDE
 
-            x = i*SQUARE_SIDE
-            pygame.draw.rect(self.gs.screen,self.rock,(x,self.screenHeight, SQUARE_SIDE, SQUARE_SIDE),0)
-            for j in range(1,h):
-                pygame.draw.rect(self.gs.screen,self.dirt, (x, self.screenHeight-j, SQUARE_SIDE, SQUARE_SIDE), 0)
-            pygame.draw.rect(self.gs.screen, self.grass, (x, self.screenHeight-h, SQUARE_SIDE, SQUARE_SIDE),0)
+            for k in range(ROCK_LEVEL,h):
+                self.gs.screen.fill(self.dirt, ((i,self.screenHeight-k), (SQUARE_SIDE, SQUARE_SIDE)))
 
+            for j in range(0,ROCK_LEVEL+random.randint(-5,5)):
+                self.gs.screen.fill(self.rock, ((i,self.screenHeight-j), (SQUARE_SIDE, SQUARE_SIDE)))
 
-
-    def generate_terrain(self):
-        pass
+            for l in range(h-ROCK_LEVEL, h):
+                self.gs.screen.fill(self.grass, ((i, self.screenHeight - l), (SQUARE_SIDE, SQUARE_SIDE)))
 
     def gen_terrain(self):
-        self.heights[0] = 10
-        mid = self.screenWidth /2
-        for i in range(0,mid):
+        self.heights[0] = 100
+        self.heights[-1] = 100
+        length = int(self.screenWidth / SQUARE_SIDE)
+        mid = int(length/2)
+        for i in range(1,mid):
             prev = self.heights[i-1]
-            addition = random.uniform(-1,1) * (1/(mid-i)) * np.sin((mid-i))
-            self.heights[i] = addition + prev
+            addition = random.uniform(-8,10)
+            self.heights[i] = int(addition + prev)
 
-        for i in range(0,mid):
-            prev = self.heights[mid + i-1]
-            addition = - random.uniform(-1,1) * (1/(mid-i)) * np.sin((mid-i))
-            self.heights[i+mid] = addition + prev
+        for j in range(length-2, mid, -1):
+            prev = self.heights[j+1]
+            addition = random.uniform(-8,10)
+            self.heights[j] = int(addition+prev)
+
+        self.heights[mid] = int((self.heights[mid+1] + self.heights[mid-1]) / 2)
+        self.heights *= SQUARE_SIDE
+
+
+
+
 
 
