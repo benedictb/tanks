@@ -10,6 +10,7 @@ class MidBullet(pygame.sprite.Sprite):
     def __init__(self, gs, pos, angle, speed, wind):
         super().__init__()
         self.pos = np.asarray(pos)
+        self.startx = self.pos[0]
         self.image = pygame.image.load('media/mid_bullet.png')
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
@@ -79,4 +80,10 @@ class MidBullet(pygame.sprite.Sprite):
             return 0
 
     def update(self):
-        self.gs.screen.blit(self.image, self.rect)
+        m = pygame.mouse.get_pos()
+
+        if m[0] < self.startx:
+            rev = pygame.transform.flip(self.image, True, False)
+            self.gs.screen.blit(rev, self.rect.center)
+        else:
+            self.gs.screen.blit(self.image, self.rect.center)
