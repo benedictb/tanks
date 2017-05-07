@@ -34,6 +34,7 @@ class GameSpace():
         self.size = self.width, self.height = 1750, 600
         self.black = 0, 0, 0
         self.screen = pygame.display.set_mode(self.size)
+        self.game_over = False
 
         # init gameobjects
         self.clock = pygame.time.Clock()
@@ -41,14 +42,17 @@ class GameSpace():
         self.terrain = Terrain(gs)
         self.gameobjects = []
         self.gameobjects.append(self.terrain)
-        self.gameobjects.append(MidTank(self, ([0, 300])))
-        self.gameobjects.append(MidTank(self, ([500, 600])))
+        self.gameobjects.append(MidTank(self, ([50, 300])))
+        self.gameobjects.append(MidTank(self, ([1700, 300])))
 
         pygame.key.set_repeat(1, 30)
 
         # start game loop
         while 1:
             self.clock.tick(60)
+
+            if self.game_over:
+                return 1
             # read user input
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -57,7 +61,7 @@ class GameSpace():
                     keys = pygame.key.get_pressed()
                     if keys[K_w]:
                         #print("jump!")
-                        self.gameobjects[1].pos[1] -= 50
+                        self.gameobjects[1].vel[1] += 50
                     if keys[K_a]:
                         self.gameobjects[1].pos[0] -= 4
                         self.bg.shift_left()

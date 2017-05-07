@@ -58,6 +58,7 @@ class MidBullet(pygame.sprite.Sprite):
 
     def hit_detect(self):
         # if bullet is above screen, definitely no hit
+
         if self.pos[1] <= 0:
             return 0
         elif self.pos[1] >= 600:
