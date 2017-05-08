@@ -79,6 +79,8 @@ class GameSpace():
                         self.gameobjects.append(obj)
                         # self.bulletConnection.transport.write((pos, obj.vel))
 
+            # self.tankConnection.transport.write((self.player1.get_pos(), self.player1.vel))
+
             #blank out screen
             self.screen.fill(self.black)
 
