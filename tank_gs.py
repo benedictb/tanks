@@ -9,13 +9,21 @@ from mid_bullet import MidBullet
 from background import Background
 from pygame.locals import *
 import time
+from twisted.internet import reactor
+import client, server
+
+FIRSTPORT = 50000
+TANKPORT = 50001
+BULLETPORT = 50002
+TERRAINPORT = 50003
 
 PIXEL_SIZE = 5
 EXPLOSION_SIZE = 8*PIXEL_SIZE
 
 class GameSpace():
-    def __init__(self, isClient=True):
-        self.isClient = isClient
+    def __init__(self, isServer=True):
+        self.isServer = isServer
+        self.connections = [False] * 4
 
     def remove_blocks(self, x, y):
         self.remove_from_gmap(x - EXPLOSION_SIZE,
@@ -57,12 +65,19 @@ class GameSpace():
         # init gameobjects
         self.clock = pygame.time.Clock()
         self.count = 0
-        self.terrain = Terrain(self)
-        self.player1 = MidTank(self, ([50, 300]))
-        self.gameobjects = []
-        self.gameobjects.append(self.terrain)
-        self.gameobjects.append(self.player1)
-        self.gameobjects.append(MidTank(self, ([1700, 300])))
+
+        if self.isServer:
+            self.terrain = Terrain(self)
+            self.player1 = MidTank(self, ([50, 300]))
+            self.player2 = MidTank(self, ([1700, 300]))
+            self.gameobjects = []
+            self.gameobjects.append(self.terrain)
+            self.gameobjects.append(self.player1)
+            self.gameobjects.append(self.player2)
+            self.server_start()
+        else:
+            self.client_start()
+
 
         pygame.key.set_repeat(1, 30)
 
@@ -115,3 +130,21 @@ class GameSpace():
             end = time.time()
             print(end-start)
 
+    def server_start(self):
+        reactor.listenTCP(FIRSTPORT, server.FirstFactory(self))
+        reactor.listenTCP(TANKPORT, server.TankFactory(self))
+        reactor.listenTCP(BULLETPORT, server.BulletFactory(self))
+        reactor.listenTCP(TERRAINPORT, server.TerrainFactory(self))
+
+        reactor.run()
+
+        while not all(self.connections):
+            time.sleep(1)
+
+    def client_start(self):
+        reactor.connectTCP('localhost',FIRSTPORT, server.FirstFactory(self))
+        reactor.connectTCP('localhost',TANKPORT, server.TankFactory(self))
+        reactor.connectTCP('localhost', BULLETPORT, server.BulletFactory(self))
+        reactor.connectTCP('localhost', TERRAINPORT, server.TerrainFactory(self))
+
+        reactor.run()

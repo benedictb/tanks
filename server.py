@@ -17,13 +17,14 @@ class FirstConnection(Protocol):
         data['terrain'] = self.gs.terrain
         data['wind'] = self.gs.wind
         self.transport.write(data)
+        self.gs.connections[0] = True
 
 class BulletConnection(Protocol):
     def __init__(self, gs):
         self.gs = gs
 
     def connectionMade(self):
-        pass
+        self.gs.connections[1] = True
 
     def dataReceived(self, data):
         assert len(data) == 2
@@ -33,6 +34,10 @@ class BulletConnection(Protocol):
 class TankConnection(Protocol):
     def __init__(self, gs):
         self.gs = gs
+
+    def connectionMade(self):
+        self.gs.connections[3] = True
+
 
     def dataReceived(self, data):
         assert len(data) == 2
@@ -44,6 +49,9 @@ class TankConnection(Protocol):
 class TerrainConnection(Protocol):
     def __init__(self, gs):
         self.gs = gs
+
+    def connectionMade(self):
+        self.gs.connections[3] = True
 
     def dataReceived(self, data):
         assert len(data) == 2
