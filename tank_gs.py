@@ -75,7 +75,9 @@ class GameSpace():
                     mouse = pygame.mouse.get_pressed()
                     if mouse[0]:
                         pos = self.player1.get_pos()
-                        self.gameobjects.append(MidBullet.from_local(self, pos, 10))
+                        obj = MidBullet.from_local(self, pos, 10)
+                        self.gameobjects.append(obj)
+                        # self.bulletConnection.transport.write((pos, obj.vel))
 
             #blank out screen
             self.screen.fill(self.black)
