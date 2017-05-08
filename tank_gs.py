@@ -3,10 +3,10 @@
 # Ben Becker
 
 import pygame
-# from terrain import Terrain
+from terrain import Terrain
 from tank import MidTank
-# from mid_bullet import MidBullet
-# from background import Background
+from mid_bullet import MidBullet
+from background import Background
 from pygame.locals import *
 import time
 
@@ -42,8 +42,8 @@ class GameSpace():
         # init gameobjects
         self.clock = pygame.time.Clock()
         self.count = 0
-        self.terrain = Terrain(gs)
-        self.player1 = MidTank(self,MidTank(self, ([50, 300])))
+        self.terrain = Terrain(self)
+        self.player1 = MidTank(self, ([50, 300]))
         self.gameobjects = []
         self.gameobjects.append(self.terrain)
         self.gameobjects.append(self.player1)
