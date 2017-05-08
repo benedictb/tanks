@@ -48,6 +48,10 @@ class TerrainConnection(Protocol):
     def __init__(self, gs):
         self.gs = gs
 
+    def dataReceived(self, data):
+        assert len(data) == 2
+        self.gs.remove_blocks(data)
+
 
 class FirstFactory(ClientFactory):
     def __init__(self, gs):

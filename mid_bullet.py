@@ -4,7 +4,7 @@ from explosion import Explosion
 from terrain import *
 import math
 GRAVITY = np.asarray([0, 0.1])
-EXPLOSION_SIZE = 9
+# EXPLOSION_SIZE = 9
 
 import pygame
 import numpy as np
@@ -24,6 +24,7 @@ class MidBullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
         self.startx = self.pos[0]
+        self.isFiring = True
 
 
     @staticmethod
@@ -55,8 +56,8 @@ class MidBullet(pygame.sprite.Sprite):
             self.rect.center = self.pos
         # explode on contact
         else:
-            self.remove_blocks(self.pos[0], self.pos[1])
-            self.gs.terrainConnection.write(self.pos)
+            self.gs.remove_blocks(self.pos[0], self.pos[1])
+            # self.gs.terrainConnection.write(self.pos)
             self.gs.gameobjects.append(Explosion(self.gs, self.pos))
             self.gs.gameobjects.remove(self)
 
@@ -93,14 +94,3 @@ class MidBullet(pygame.sprite.Sprite):
         else:
             self.gs.screen.blit(self.image, self.rect.center)
 
-    def remove_blocks(self, x, y):
-        self.gs.remove_from_gmap(x - EXPLOSION_SIZE,
-                                 x + EXPLOSION_SIZE,
-                                 self.gs.height - y - EXPLOSION_SIZE,
-                                 self.gs.height - y + EXPLOSION_SIZE)
-
-        # self.gs.terrain.create_surface()
-        self.gs.terrain.remove_blocks(x - EXPLOSION_SIZE,
-                                      x + EXPLOSION_SIZE,
-                                      y - EXPLOSION_SIZE,
-                                      y + EXPLOSION_SIZE)

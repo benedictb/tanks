@@ -10,9 +10,24 @@ from background import Background
 from pygame.locals import *
 import time
 
+PIXEL_SIZE = 5
+EXPLOSION_SIZE = 8*PIXEL_SIZE
+
 class GameSpace():
     def __init__(self, isClient=True):
         self.isClient = isClient
+
+    def remove_blocks(self, x, y):
+        self.remove_from_gmap(x - EXPLOSION_SIZE,
+                                 x + EXPLOSION_SIZE,
+                                 self.height - y - EXPLOSION_SIZE,
+                                 self.height - y + EXPLOSION_SIZE)
+
+        # self.gs.terrain.create_surface()
+        self.terrain.remove_blocks(x - EXPLOSION_SIZE,
+                                      x + EXPLOSION_SIZE,
+                                      y - EXPLOSION_SIZE,
+                                      y + EXPLOSION_SIZE)
 
     def get_height(self, x):
         x = x % self.width
