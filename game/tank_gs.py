@@ -12,6 +12,7 @@ import time
 from twisted.internet import reactor
 import net.client as client
 import net.server as server
+from twisted.internet.task import LoopingCall
 
 FIRSTPORT = 50000
 TANKPORT = 50001
@@ -86,54 +87,55 @@ class GameSpace():
 
         pygame.key.set_repeat(1, 30)
 
-        # start game loop
-        while 1:
-            start = time.time()
-            self.clock.tick(60)
-            self.count += 1
 
-            if self.game_over:
-                return 1
-            # read user input
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    return 0
-                if event.type == KEYDOWN:
-                    keys = pygame.key.get_pressed()
-                    if keys[K_w]:
-                        #print("jump!")
-                        self.player1.vel[1] += 50
-                    if keys[K_a]:
-                        self.gameobjects[1].pos[0] -= 4
-                        #self.bg.shift_left()
-                    if keys[K_d]:
-                        self.gameobjects[1].pos[0] += 4
-                        #self.bg.shift_right()
-                if event.type == MOUSEBUTTONDOWN:
-                    mouse = pygame.mouse.get_pressed()
-                    if mouse[0]:
-                        pos = self.player1.get_pos()
-                        obj = MidBullet.from_local(self, pos, 10)
-                        self.gameobjects.append(obj)
-                        # self.bulletConnection.transport.write((pos, obj.vel))
+    # start game loop
+    def game_loop(self):
+        start = time.time()
+        self.clock.tick(60)
+        self.count += 1
 
-            #self.tankConnection.transport.write((self.player1.get_pos(), self.player1.vel))
+        if self.game_over:
+            return 1
+        # read user input
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                return 0
+            if event.type == KEYDOWN:
+                keys = pygame.key.get_pressed()
+                if keys[K_w]:
+                    #print("jump!")
+                    self.player1.vel[1] += 50
+                if keys[K_a]:
+                    self.gameobjects[1].pos[0] -= 4
+                    #self.bg.shift_left()
+                if keys[K_d]:
+                    self.gameobjects[1].pos[0] += 4
+                    #self.bg.shift_right()
+            if event.type == MOUSEBUTTONDOWN:
+                mouse = pygame.mouse.get_pressed()
+                if mouse[0]:
+                    pos = self.player1.get_pos()
+                    obj = MidBullet.from_local(self, pos, 10)
+                    self.gameobjects.append(obj)
+                    # self.bulletConnection.transport.write((pos, obj.vel))
 
-            #blank out screen
-            self.screen.fill(self.black)
+        #self.tankConnection.transport.write((self.player1.get_pos(), self.player1.vel))
 
-            # call tick on each object
-            for gameobject in self.gameobjects:
-                gameobject.tick()
+        #blank out screen
+        self.screen.fill(self.black)
 
-            # update screen
-            for gameobject in self.gameobjects:
-                gameobject.update()
+        # call tick on each object
+        for gameobject in self.gameobjects:
+            gameobject.tick()
 
-            pygame.display.flip()
+        # update screen
+        for gameobject in self.gameobjects:
+            gameobject.update()
 
-            end = time.time()
-            print(end-start)
+        pygame.display.flip()
+
+        end = time.time()
+        print(end-start)
 
     def server_start(self):
         reactor.listenTCP(FIRSTPORT, server.FirstFactory(self))
@@ -141,10 +143,14 @@ class GameSpace():
         reactor.listenTCP(BULLETPORT, server.BulletFactory(self))
         reactor.listenTCP(TERRAINPORT, server.TerrainFactory(self))
 
-        reactor.run()
-
         while not all(self.connections):
             time.sleep(1)
+
+        lc = LoopingCall(self.game_loop())
+        lc.start(1/60)
+        reactor.run()
+
+
 
     def client_start(self):
         self.firstConnection = reactor.connectTCP('localhost',FIRSTPORT, client.FirstFactory(self))
@@ -152,4 +158,6 @@ class GameSpace():
         self.bulletConnection = reactor.connectTCP('localhost', BULLETPORT, client.BulletFactory(self))
         self.terrainConnection = reactor.connectTCP('localhost', TERRAINPORT, client.TerrainFactory(self))
 
+        lc = LoopingCall(self.game_loop())
+        lc.start(1/60)
         reactor.run()
