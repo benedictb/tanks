@@ -41,9 +41,10 @@ class GameSpace():
         self.clock = pygame.time.Clock()
         # self.bg = Background(self)
         self.terrain = Terrain(gs)
+        self.player1 = MidTank(self,MidTank(self, ([50, 300])))
         self.gameobjects = []
         self.gameobjects.append(self.terrain)
-        self.gameobjects.append(MidTank(self, ([50, 300])))
+        self.gameobjects.append(self.player1)
         self.gameobjects.append(MidTank(self, ([1700, 300])))
 
         pygame.key.set_repeat(1, 30)
@@ -63,21 +64,18 @@ class GameSpace():
                     keys = pygame.key.get_pressed()
                     if keys[K_w]:
                         #print("jump!")
-                        self.gameobjects[1].vel[1] += 50
+                        self.player1.vel[1] += 50
                     if keys[K_a]:
-                        self.gameobjects[1].pos[0] -= 4
+                        self.player1.pos[0] -= 4
                         # self.bg.shift_left()
                     if keys[K_d]:
-                        self.gameobjects[1].pos[0] += 4
+                        self.player1.pos[0] += 4
                         # self.bg.shift_right()
                 if event.type == MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pressed()
                     if mouse[0]:
-                        #print("fire")
-                        pos = self.gameobjects[1].get_pos()
-                        # pos[0]+=5; pos[1]+=5
+                        pos = self.player1.get_pos()
                         self.gameobjects.append(MidBullet.from_local(self, pos, 10))
-                        # fire cannon
 
             #blank out screen
             self.screen.fill(self.black)
@@ -96,6 +94,3 @@ class GameSpace():
             end = time.time()
             print(end-start)
 
-if __name__ == '__main__':
-    gs = GameSpace()
-    gs.main()
