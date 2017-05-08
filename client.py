@@ -5,7 +5,7 @@ from twisted.internet import reactor
 from twisted.internet.defer import DeferredQueue
 from mid_bullet import *
 from tank import *
-
+import pickle
 
 
 class FirstConnection(Protocol):
@@ -13,15 +13,16 @@ class FirstConnection(Protocol):
         self.gs = gs
 
     def dataReceived(self, data):
-        data = eval(data)
-        self.gs.player2 = MidTank(self.gs, data[0])
-        self.gs.player1 = MidTank(self.gs, data[1])
+        dlist = pickle.loads(data)
+        print(dir(self.gs))
+        self.gs.player2 = MidTank(self.gs, dlist[0])
+        self.gs.player1 = MidTank(self.gs, dlist[1])
         self.gs.gameobjects.append(self.gs.player1)
         self.gs.gameobjects.append(self.gs.player2)
-        terrain_bytes = data[2]
-        self.gs.terrain = Terrain.from_gmap(np.fromstring(terrain_bytes,dtype='int'))
+        heights = dlist[2]
+        self.gs.terrain = Terrain.from_heights(self.gs, heights)
         self.gs.gameobjects.append(self.gs.terrain)
-        self.gs.wind = data[3]
+        self.gs.wind = dlist[3]
 
 
 class BulletConnection(Protocol):

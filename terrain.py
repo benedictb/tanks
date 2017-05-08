@@ -28,14 +28,24 @@ class Terrain(pygame.sprite.Sprite):
     @staticmethod
     def random(gs):
         t = Terrain(gs)
-        gmap = t.gen_terrain()
+        heights = t.gen_terrain()
+        gs.heights = heights
+        gmap = t.gen_gmap(heights)
         t.create_surface(gmap)
         gs.gmap = gmap
         return t
 
+    # @staticmethod
+    # def from_gmap(gs,gmap):
+    #     t = Terrain(gs)
+    #     t.create_surface(gmap)
+    #     gs.gmap = gmap
+    #     return t
+
     @staticmethod
-    def from_gmap(gs,gmap):
+    def from_heights(self, gs, heights):
         t = Terrain(gs)
+        gmap = t.gen_gmap(heights)
         t.create_surface(gmap)
         gs.gmap = gmap
         return t
@@ -66,30 +76,33 @@ class Terrain(pygame.sprite.Sprite):
         self.gs.screen.blit(self.image, self.image.get_rect())
 
     def gen_terrain(self):
+
+        # Try generating a map, if it doesn't fit, try again (should'nt happen more than once
+        self.heights[0] = 100 # Left and right start the same way
+        self.heights[-1] = 100
+        length = int(self.screenWidth / PIXEL_SIZE)
+        height = int(self.screenHeight / PIXEL_SIZE)
+        mid = int(length/2)
+
+        # Generate the graph with a random step, with a higher probabability of going up in the middle
+        for i in range(1,mid):
+            prev = self.heights[i-1]
+            addition = random.uniform(-8,13)
+            self.heights[i] = int(addition + prev)
+
+        for j in range(length-2, mid, -1):
+            prev = self.heights[j+1]
+            addition = random.uniform(-8,13)
+            self.heights[j] = int(addition+prev)
+
+        # Make a adjustment in the middle in case there's a gap. This could be better
+        self.heights[mid] = int((self.heights[mid+1] + self.heights[mid-1]) / 2)
+        return np.floor_divide(np.asarray(self.heights, dtype=int), PIXEL_SIZE).tolist()
+
+    def gen_gmap(self, heights):
         try:
-            # Try generating a map, if it doesn't fit, try again (should'nt happen more than once
-            self.heights[0] = 100 # Left and right start the same way
-            self.heights[-1] = 100
-            length = int(self.screenWidth / PIXEL_SIZE)
-            height = int(self.screenHeight / PIXEL_SIZE)
-            mid = int(length/2)
-
-            # Generate the graph with a random step, with a higher probabability of going up in the middle
-            for i in range(1,mid):
-                prev = self.heights[i-1]
-                addition = random.uniform(-8,13)
-                self.heights[i] = int(addition + prev)
-
-            for j in range(length-2, mid, -1):
-                prev = self.heights[j+1]
-                addition = random.uniform(-8,13)
-                self.heights[j] = int(addition+prev)
-
-            # Make a adjustment in the middle in case there's a gap. This could be better
-            self.heights[mid] = int((self.heights[mid+1] + self.heights[mid-1]) / 2)
-            self.heights = np.floor_divide(np.asarray(self.heights, dtype=int), PIXEL_SIZE)
-
             # This is a map of the tiles
+            self.heights = heights
             gmap = np.zeros((self.screenWidth, self.screenHeight))
 
             # The next loops define which sort of tile they are (what color)
@@ -113,7 +126,7 @@ class Terrain(pygame.sprite.Sprite):
 
             return gmap
         except IndexError:
-            self.gen_terrain()
+            self.gen_gmap(heights)
 
     def remove_blocks(self, x1, x2, y1, y2):
         self.image.fill(self.black, ((x1, y1), (x2-x1,y2-y1)))

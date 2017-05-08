@@ -65,20 +65,20 @@ class GameSpace():
         # init gameobjects
         self.clock = pygame.time.Clock()
         self.count = 0
+        self.gameobjects = []
 
         if self.isServer:
             self.terrain = Terrain.random(self)
             # self.terrain.update()
             # pygame.display.flip()
-
             self.player1 = MidTank(self, ([50, 300]))
             self.player2 = MidTank(self, ([1700, 300]))
-            self.gameobjects = []
             self.gameobjects.append(self.terrain)
             self.gameobjects.append(self.player1)
             self.gameobjects.append(self.player2)
             self.server_start()
         else:
+            print('uhh')
             self.client_start()
 
 

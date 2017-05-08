@@ -5,6 +5,7 @@ from twisted.internet import reactor
 from twisted.internet.defer import DeferredQueue
 from mid_bullet import *
 import unicodedata
+import pickle
 
 
 class FirstConnection(Protocol):
@@ -16,13 +17,16 @@ class FirstConnection(Protocol):
         data = [0] * 4
         data[0] = self.gs.player1.pos
         data[1] = self.gs.player2.pos
-        data[2] = self.gs.gmap.tobytes()
+        data[2] = self.gs.heights
         data[3] = 0 #self.gs.wind
+
+        dstring = pickle.dumps(data)
         # data = str(data).encode('ascii')
         # unicodedata.normalize('NFKD', data).encode('ascii', 'ignore')
         # bytes = str.encode()
-        print(str(data).encode('ascii'))
-        self.transport.write(str(data).encode('ascii'))
+        # print(str(data).encode('ascii'))
+        # self.transport.write(str(data).encode('ascii'))
+        self.transport.write(dstring)
         self.gs.connections[0] = True
 
 class BulletConnection(Protocol):
