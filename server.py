@@ -12,6 +12,8 @@ class FirstConnection(Protocol):
 
     def connectionMade(self):
         data = dict()
+        data['player1'] = self.gs.player1.pos
+        data['player2'] = self.gs.player2.pos
         data['terrain'] = self.gs.terrain
         data['wind'] = self.gs.wind
         self.transport.write(data)

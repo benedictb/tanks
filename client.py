@@ -4,17 +4,21 @@ from twisted.internet.protocol import Protocol
 from twisted.internet import reactor
 from twisted.internet.defer import DeferredQueue
 from mid_bullet import *
+from tank import *
 
 
 class FirstConnection(Protocol):
     def __init__(self, gs):
         self.gs = gs
 
-    def connectionMade(self):
-        data = dict()
-        data['terrain'] = self.gs.terrain
-        data['wind'] = self.gs.wind
-        self.transport.write(data)
+    def dataReceived(self, data):
+        self.gs.player2 = MidTank(self.gs, data['player1'])
+        self.gs.player1 = MidTank(self.gs, data['player2'])
+        self.gs.gameobjects.append(self.gs.player1)
+        self.gs.gameobjects.append(self.gs.player2)
+        self.gs.terrain = data['terrain']
+        self.gs.wind = data['wind']
+
 
 class BulletConnection(Protocol):
     def __init__(self, gs):
@@ -39,28 +43,29 @@ class TankConnection(Protocol):
         self.gs.player2.pos = pos
         self.gs.player2.health = health
 
+
 class TerrainConnection(Protocol):
     def __init__(self, gs):
         self.gs = gs
 
 
-
-
-class FirstFactory(Factory):
+class FirstFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = FirstConnection(gs)
 
     def buildProtocol(self, addr):
         return self.myconn
 
-class BulletFactory(Factory):
+
+class BulletFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = BulletConnection(gs)
 
     def buildProtocol(self, addr):
         return self.myconn
 
-class TankFactory(Factory):
+
+class TankFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = TankConnection(gs)
 
@@ -68,7 +73,7 @@ class TankFactory(Factory):
         return self.myconn
 
 
-class TerrainFactory(Factory):
+class TerrainFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = TerrainConnection(gs)
 
