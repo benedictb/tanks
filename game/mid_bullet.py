@@ -11,6 +11,8 @@ import numpy as np
 from game.explosion import Explosion
 from game.terrain import *
 import math
+import pickle
+
 GRAVITY = np.asarray([0, 0.1])
 EXPLOSION_SIZE = 8*PIXEL_SIZE
 
@@ -57,7 +59,8 @@ class MidBullet(pygame.sprite.Sprite):
         # explode on contact
         else:
             self.gs.remove_blocks(self.pos[0], self.pos[1])
-            self.gs.terrainConnection.write(self.pos)
+            data = pickle.dumps(self.pos)
+            self.gs.terrainConnection.write(data)
             self.gs.gameobjects.append(Explosion(self.gs, self.pos))
             self.gs.gameobjects.remove(self)
 

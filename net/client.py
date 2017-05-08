@@ -34,18 +34,18 @@ class BulletConnection(Protocol):
         pass
 
     def dataReceived(self, data):
-        assert len(data) == 2
         # create bullet locally
-        self.gs.gameobjects.append(MidBullet.from_network(self, data[0], data[1]))
+        dlist = pickle.loads(data)
+        self.gs.gameobjects.append(MidBullet.from_network(self, dlist[0], dlist[1]))
 
 class TankConnection(Protocol):
     def __init__(self, gs):
         self.gs = gs
 
     def dataReceived(self, data):
-        assert len(data) == 2
-        pos = data[0]
-        health = data[1]
+        dlist = pickle.loads(data)
+        pos = dlist[0]
+        health = dlist[1]
         self.gs.player2.pos = pos
         self.gs.player2.health = health
 
@@ -55,7 +55,7 @@ class TerrainConnection(Protocol):
         self.gs = gs
 
     def dataReceived(self, data):
-        assert len(data) == 2
+        data = pickle.loads(data)
         self.gs.remove_blocks(data)
 
 
