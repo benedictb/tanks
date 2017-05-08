@@ -3,14 +3,25 @@ from twisted.internet.protocol import ClientFactory
 from twisted.internet.protocol import Protocol
 from twisted.internet import reactor
 from twisted.internet.defer import DeferredQueue
+from mid_bullet import *
+
 
 class FirstConnection(Protocol):
     def __init__(self):
         pass
 
+    def connectionMade(self):
+        self.transport.write("terrain+wind dict")
+
 class BulletConnection(Protocol):
     def __init__(self):
         pass
+
+    def connectionMade(self):
+        pass
+
+    def dataReceived(self, data):
+        self.gs.gameobjects.append(MidBullet(self, pos, 0, 10, 0))
 
 class TankConnection(Protocol):
     def __init__(self):

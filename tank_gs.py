@@ -39,7 +39,7 @@ class GameSpace():
 
         # init gameobjects
         self.clock = pygame.time.Clock()
-        # self.bg = Background(self)
+
         self.terrain = Terrain(gs)
         self.gameobjects = []
         self.gameobjects.append(self.terrain)
@@ -66,10 +66,10 @@ class GameSpace():
                         self.gameobjects[1].vel[1] += 50
                     if keys[K_a]:
                         self.gameobjects[1].pos[0] -= 4
-                        # self.bg.shift_left()
+                        #self.bg.shift_left()
                     if keys[K_d]:
                         self.gameobjects[1].pos[0] += 4
-                        # self.bg.shift_right()
+                        #self.bg.shift_right()
                 if event.type == MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pressed()
                     if mouse[0]:
@@ -87,7 +87,6 @@ class GameSpace():
                 gameobject.tick()
 
             # update screen
-            # self.bg.update()
             for gameobject in self.gameobjects:
                 gameobject.update()
 
