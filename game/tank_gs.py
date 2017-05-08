@@ -13,6 +13,7 @@ from twisted.internet import reactor
 import net.client as client
 import net.server as server
 from twisted.internet.task import LoopingCall
+import pickle
 
 FIRSTPORT = 50000
 TANKPORT = 50001
@@ -117,9 +118,19 @@ class GameSpace():
                     pos = self.player1.get_pos()
                     obj = MidBullet.from_local(self, pos, 10)
                     self.gameobjects.append(obj)
-                    # self.bulletConnection.transport.write((pos, obj.vel))
 
-        #self.tankConnection.transport.write((self.player1.get_pos(), self.player1.vel))
+                    data = [] * 2
+                    data[0] = pos
+                    data[1] = obj.vel
+                    dstring = pickle.dumps(data)
+                    self.bulletConnection.transport.write(dstring)
+
+        # send tank data
+        tankdata = [] * 2
+        tankdata[0] = self.player1.get_pos()
+        tankdata[1] = self.player1.health
+        ptankdata = pickle.dumps(tankdata)
+        self.tankConnection.transport.write(ptankdata)
 
         #blank out screen
         self.screen.fill(self.black)
