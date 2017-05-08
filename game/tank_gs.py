@@ -25,6 +25,11 @@ class GameSpace():
     def __init__(self, isServer=True):
         self.isServer = isServer
         self.connections = [False] * 4
+        self.gameobjects = []
+        self.size = self.width, self.height = 1750, 600
+        self.black = 0, 0, 0
+        self.screen = pygame.display.set_mode(self.size)
+        self.game_over = False
 
     def remove_blocks(self, x, y):
         self.remove_from_gmap(x - EXPLOSION_SIZE,
@@ -58,26 +63,22 @@ class GameSpace():
     def main(self):
         # init gamespace
         pygame.init()
-        self.size = self.width, self.height = 1750, 600
-        self.black = 0, 0, 0
-        self.screen = pygame.display.set_mode(self.size)
-        self.game_over = False
 
         # init gameobjects
         self.clock = pygame.time.Clock()
         self.count = 0
-        self.gameobjects = []
+
 
         if self.isServer:
             self.terrain = Terrain.random(self)
-            # self.terrain.update()
-            # pygame.display.flip()
+            self.terrain.update()
+            pygame.display.flip()
             self.player1 = MidTank(self, ([50, 300]))
             self.player2 = MidTank(self, ([1700, 300]))
             self.gameobjects.append(self.terrain)
             self.gameobjects.append(self.player1)
             self.gameobjects.append(self.player2)
-            # self.server_start()
+            self.server_start()
         else:
             print('uhh')
             self.client_start()
@@ -116,7 +117,7 @@ class GameSpace():
                         self.gameobjects.append(obj)
                         # self.bulletConnection.transport.write((pos, obj.vel))
 
-            # self.tankConnection.transport.write((self.player1.get_pos(), self.player1.vel))
+            #self.tankConnection.transport.write((self.player1.get_pos(), self.player1.vel))
 
             #blank out screen
             self.screen.fill(self.black)

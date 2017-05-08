@@ -43,7 +43,7 @@ class Terrain(pygame.sprite.Sprite):
     #     return t
 
     @staticmethod
-    def from_heights(self, gs, heights):
+    def from_heights(gs, heights):
         t = Terrain(gs)
         gmap = t.gen_gmap(heights)
         t.create_surface(gmap)

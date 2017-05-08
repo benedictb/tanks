@@ -6,6 +6,7 @@ from twisted.internet.defer import DeferredQueue
 from game.mid_bullet import MidBullet
 from game.tank import MidTank
 import pickle
+from game.terrain import *
 
 
 class FirstConnection(Protocol):
