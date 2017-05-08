@@ -8,6 +8,7 @@ from tank import MidTank
 from mid_bullet import MidBullet
 from background import Background
 from pygame.locals import *
+import time
 
 class GameSpace():
 
@@ -38,7 +39,7 @@ class GameSpace():
 
         # init gameobjects
         self.clock = pygame.time.Clock()
-        self.bg = Background(self)
+        # self.bg = Background(self)
         self.terrain = Terrain(gs)
         self.gameobjects = []
         self.gameobjects.append(self.terrain)
@@ -49,6 +50,7 @@ class GameSpace():
 
         # start game loop
         while 1:
+            start = time.time()
             self.clock.tick(60)
 
             if self.game_over:
@@ -64,17 +66,17 @@ class GameSpace():
                         self.gameobjects[1].vel[1] += 50
                     if keys[K_a]:
                         self.gameobjects[1].pos[0] -= 4
-                        self.bg.shift_left()
+                        # self.bg.shift_left()
                     if keys[K_d]:
                         self.gameobjects[1].pos[0] += 4
-                        self.bg.shift_right()
+                        # self.bg.shift_right()
                 if event.type == MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pressed()
                     if mouse[0]:
                         #print("fire")
                         pos = self.gameobjects[1].get_pos()
                         # pos[0]+=5; pos[1]+=5
-                        self.gameobjects.append(MidBullet(self, pos, 0, 10, 0))
+                        self.gameobjects.append(MidBullet.from_local(self, pos, 10))
                         # fire cannon
 
             #blank out screen
@@ -85,11 +87,14 @@ class GameSpace():
                 gameobject.tick()
 
             # update screen
-            self.bg.update()
+            # self.bg.update()
             for gameobject in self.gameobjects:
                 gameobject.update()
 
             pygame.display.flip()
+
+            end = time.time()
+            print(end-start)
 
 if __name__ == '__main__':
     gs = GameSpace()
