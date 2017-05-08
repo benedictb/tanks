@@ -4,36 +4,49 @@ from explosion import Explosion
 from terrain import *
 import math
 GRAVITY = np.asarray([0, 0.1])
+EXPLOSION_SIZE = 9
+
+import pygame
+import numpy as np
+from explosion import Explosion
+from terrain import *
+import math
+GRAVITY = np.asarray([0, 0.1])
 EXPLOSION_SIZE = 8*PIXEL_SIZE
 
 class MidBullet(pygame.sprite.Sprite):
-    def __init__(self, gs, pos, angle, speed, wind):
+    def __init__(self, gs, pos, vel):
         super().__init__()
-        self.pos = np.asarray(pos)
-        self.startx = self.pos[0]
+        self.gs = gs
         self.image = pygame.image.load('media/mid_bullet.png')
+        self.pos = np.asarray(pos)
+        self.vel = vel
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
-        # get angle of trajectory
-        self.x, self.y = pygame.mouse.get_pos()
-        self.angle = 360 - math.atan2(self.y - self.rect.centery, self.x - self.rect.centerx) * 180 / math.pi
-        # use angle to get x and y velocity
-        self.velx = speed * math.cos(math.radians(360 - self.angle))
-        self.vely = speed * math.sin(math.radians(360 - self.angle))
-        self.vel = np.asarray([self.velx, self.vely])
-        #print("velx: " + str(self.velx) + " vely: " + str(self.vely))
-        # self.vel = np.asarray([np.cos(self.angle)*speed, np.sin(self.angle)*speed], dtype='float32')
-        self.wind = wind
-        self.gs = gs
-        self.explosiongif = 0
-        self.isFiring = True
+        self.startx = self.pos[0]
+
+
+    @staticmethod
+    def from_local(gs, pos, speed):
+        x, y = pygame.mouse.get_pos()
+        angle = 360 - math.atan2(y - pos[1], x - pos[0]) * 180 / math.pi
+        velx = speed * math.cos(math.radians(360 - angle))
+        vely = speed * math.sin(math.radians(360 - angle))
+        vel = np.asarray([velx, vely])
+        obj = MidBullet(gs,pos,vel)
+        return obj
+
+    @staticmethod
+    def from_network(gs, pos, vel):
+        obj = MidBullet(gs, pos, vel)
+        return obj
 
     def tick(self):
         ground = self.gs.height - self.gs.get_height(self.rect.centerx)
 
         # if not hit anything, keep going
         if not self.hit_detect():
-            acc = self.wind + GRAVITY
+            acc = GRAVITY
             self.vel[0] += acc[0]
             self.vel[1] += acc[1]
             self.pos[0] += self.vel[0]
