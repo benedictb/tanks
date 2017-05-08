@@ -3,14 +3,14 @@
 # Ben Becker
 
 import pygame
-from terrain import Terrain
-from tank import MidTank
-from mid_bullet import MidBullet
-from background import Background
+from game.terrain import Terrain
+from game.tank import MidTank
+from game.mid_bullet import MidBullet
+from game.background import Background
 from pygame.locals import *
 import time
 from twisted.internet import reactor
-import client, server
+import net.client, net.server
 
 FIRSTPORT = 50000
 TANKPORT = 50001

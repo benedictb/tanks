@@ -1,5 +1,5 @@
 import pygame
-from terrain import *
+from game.terrain import *
 import numpy as np
 GRAVITY = np.asarray([0, 2])
 
