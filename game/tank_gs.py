@@ -85,14 +85,14 @@ class GameSpace():
             self.client_start()
 
 
-        pygame.key.set_repeat(1, 30)
+        # pygame.key.set_repeat(1, 30)
 
 
     # start game loop
     def game_loop(self):
-
         if not all(self.connections):
             return
+
 
         start = time.time()
         # self.clock.tick(60)
@@ -104,20 +104,23 @@ class GameSpace():
         for event in pygame.event.get():
             if event.type == QUIT:
                 return 0
-            if event.type == KEYDOWN:
-                keys = pygame.key.get_pressed()
-                if keys[K_w]:
-                    #print("jump!")
-                    self.player1.vel[1] += 50
-                if keys[K_a]:
-                    self.player1.pos[0] -= 4
-                    #self.bg.shift_left()
-                if keys[K_d]:
-                    self.player1.pos[0] += 4
+
+            keys = pygame.key.get_pressed()
+            if keys[K_w]:
+                #print("jump!")
+                self.player1.vel[1] += 50
+            elif keys[K_a]:
+                self.player1.vel[0] = -1
+                #self.bg.shift_left()
+            elif keys[K_d]:
+                self.player1.vel[0] = 1
+            else:
+                self.player1.vel[0] = 0
                     #self.bg.shift_right()
-            if event.type == MOUSEBUTTONDOWN:
+
+            if event.type == MOUSEBUTTONDOWN or event.type == K_DOWN:
                 mouse = pygame.mouse.get_pressed()
-                if mouse[0]:
+                if mouse[0] or keys[K_SPACE]:
                     pos = self.player1.get_pos()
                     obj = MidBullet.from_local(self, pos, 10)
                     self.gameobjects.append(obj)
