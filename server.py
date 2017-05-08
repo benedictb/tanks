@@ -50,21 +50,21 @@ class TerrainConnection(Protocol):
         self.gs.remove_blocks(data)
 
 
-class FirstFactory(Factory):
+class FirstFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = FirstConnection(gs)
 
     def buildProtocol(self, addr):
         return self.myconn
 
-class BulletFactory(Factory):
+class BulletFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = BulletConnection(gs)
 
     def buildProtocol(self, addr):
         return self.myconn
 
-class TankFactory(Factory):
+class TankFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = TankConnection(gs)
 
@@ -72,7 +72,7 @@ class TankFactory(Factory):
         return self.myconn
 
 
-class TerrainFactory(Factory):
+class TerrainFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = TerrainConnection(gs)
 
