@@ -14,6 +14,7 @@ import net.client as client
 import net.server as server
 from twisted.internet.task import LoopingCall
 import pickle
+import twisted
 
 FIRSTPORT = 50000
 TANKPORT = 50001
@@ -32,6 +33,10 @@ class GameSpace():
         self.black = 0, 0, 0
         self.screen = pygame.display.set_mode(self.size)
         self.game_over = False
+        # init gameobjects
+        self.clock = pygame.time.Clock()
+        self.count = 0
+        self.run = False
 
     def remove_blocks(self, x, y):
         self.remove_from_gmap(x - EXPLOSION_SIZE,
@@ -39,7 +44,7 @@ class GameSpace():
                                  self.height - y - EXPLOSION_SIZE,
                                  self.height - y + EXPLOSION_SIZE)
 
-        # self.gs.terrain.create_surface()
+        # self.terrain.create_surface(self.gmap)
         self.terrain.remove_blocks(x - EXPLOSION_SIZE,
                                       x + EXPLOSION_SIZE,
                                       y - EXPLOSION_SIZE,
@@ -66,15 +71,9 @@ class GameSpace():
         # init gamespace
         pygame.init()
 
-        # init gameobjects
-        self.clock = pygame.time.Clock()
-        self.count = 0
-
 
         if self.isServer:
             self.terrain = Terrain.random(self)
-            self.terrain.update()
-            pygame.display.flip()
             self.player1 = MidTank(self, ([50, 300]))
             self.player2 = MidTank(self, ([1700, 300]))
             self.gameobjects.append(self.terrain)
@@ -91,8 +90,12 @@ class GameSpace():
 
     # start game loop
     def game_loop(self):
+
+        if not all(self.connections):
+            return
+
         start = time.time()
-        self.clock.tick(60)
+        # self.clock.tick(60)
         self.count += 1
 
         if self.game_over:
@@ -107,10 +110,10 @@ class GameSpace():
                     #print("jump!")
                     self.player1.vel[1] += 50
                 if keys[K_a]:
-                    self.gameobjects[1].pos[0] -= 4
+                    self.player1.pos[0] -= 4
                     #self.bg.shift_left()
                 if keys[K_d]:
-                    self.gameobjects[1].pos[0] += 4
+                    self.player1.pos[0] += 4
                     #self.bg.shift_right()
             if event.type == MOUSEBUTTONDOWN:
                 mouse = pygame.mouse.get_pressed()
@@ -119,14 +122,14 @@ class GameSpace():
                     obj = MidBullet.from_local(self, pos, 10)
                     self.gameobjects.append(obj)
 
-                    data = [] * 2
+                    data = [0] * 2
                     data[0] = pos
                     data[1] = obj.vel
                     dstring = pickle.dumps(data)
                     self.bulletConnection.transport.write(dstring)
 
         # send tank data
-        tankdata = [] * 2
+        tankdata = [0] * 2
         tankdata[0] = self.player1.get_pos()
         tankdata[1] = self.player1.health
         ptankdata = pickle.dumps(tankdata)
@@ -154,11 +157,18 @@ class GameSpace():
         reactor.listenTCP(BULLETPORT, server.BulletFactory(self))
         reactor.listenTCP(TERRAINPORT, server.TerrainFactory(self))
 
-        while not all(self.connections):
-            time.sleep(1)
+        # while not all(self.connections):
+        #     print(self.connections)
+        #     time.sleep(1)
 
-        lc = LoopingCall(self.game_loop())
-        lc.start(1/60)
+        # if not self.run:
+        #     if all(self.connections):
+        #         self.run = True
+        #     return
+
+        lc = LoopingCall(self.game_loop)
+        lc.start(1/60).addErrback(twisted.python.log.err)
+        print(self.connections)
         reactor.run()
 
 
@@ -169,6 +179,12 @@ class GameSpace():
         self.bulletConnection = reactor.connectTCP('localhost', BULLETPORT, client.BulletFactory(self))
         self.terrainConnection = reactor.connectTCP('localhost', TERRAINPORT, client.TerrainFactory(self))
 
-        lc = LoopingCall(self.game_loop())
-        lc.start(1/60)
+        # while not all(self.connections):
+        #     print(self.connections)
+        #     time.sleep(1)
+
+        lc = LoopingCall(self.game_loop)
+        lc.start(1/60).addErrback(twisted.python.log.err)
+        print(self.connections)
         reactor.run()
+

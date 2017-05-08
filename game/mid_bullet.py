@@ -60,7 +60,7 @@ class MidBullet(pygame.sprite.Sprite):
         else:
             self.gs.remove_blocks(self.pos[0], self.pos[1])
             data = pickle.dumps(self.pos)
-            self.gs.terrainConnection.write(data)
+            self.gs.terrainConnection.transport.write(data)
             self.gs.gameobjects.append(Explosion(self.gs, self.pos))
             self.gs.gameobjects.remove(self)
 
@@ -72,14 +72,14 @@ class MidBullet(pygame.sprite.Sprite):
         elif self.pos[1] >= 600:
             self.gs.gameobjects.remove(self)
         # if bullet hits player 2, hit
-        elif pygame.sprite.collide_rect(self, self.gs.gameobjects[2]) and self.isFiring:
-            print("HIT")
-            self.isFiring = False
-            self.gs.gameobjects[2].health -= 50
-            print("enemy health: " + str(self.gs.gameobjects[2].health))
-            return 1
-        elif pygame.sprite.collide_rect(self, self.gs.gameobjects[2]):
-            return 1
+        # elif pygame.sprite.collide_rect(self, self.gs.player2) and self.isFiring:
+        #     print("HIT")
+        #     self.isFiring = False
+        #     self.gs.player2.health -= 50
+        #     print("enemy health: " + str(self.gs.player2.health))
+        #     return 1
+        # elif pygame.sprite.collide_rect(self, self.gs.player2):
+        #     return 1
         # if bullet hits ground, hit detect
         elif self.gs.gmap[self.pos[0], self.gs.height - self.pos[1]] != 0:
             self.isFiring = False
