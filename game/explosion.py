@@ -1,5 +1,5 @@
 import pygame
-
+from pygame.mixer import Sound
 
 class Explosion(pygame.sprite.Sprite):
     def __init__(self,gs, pos):
@@ -12,6 +12,7 @@ class Explosion(pygame.sprite.Sprite):
         self.rect = pos
         self.timer = 0
         self.gs = gs
+        self.gs.explode.play()
 
     def tick(self):
         self.timer += 1

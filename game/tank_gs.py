@@ -15,6 +15,8 @@ import net.server as server
 from twisted.internet.task import LoopingCall
 import pickle
 import twisted
+from pygame.mixer import Sound
+
 
 FIRSTPORT = 50000
 TANKPORT = 50001
@@ -30,13 +32,24 @@ class GameSpace():
         self.connections = [False] * 4
         self.gameobjects = []
         self.size = self.width, self.height = 1750, 600
-        self.black = 0, 0, 0
         self.screen = pygame.display.set_mode(self.size)
+        self.black = 0, 0, 0
         self.game_over = False
         # init gameobjects
         self.clock = pygame.time.Clock()
         self.count = 0
         self.run = False
+        pygame.mixer.pre_init(22100, -16, 1, 512)
+        pygame.mixer.init()
+        pygame.init()
+        pygame.mixer.music.load('media/music.mp3')
+        pygame.mixer.music.play()
+        self.explode = Sound('media/explode.wav')
+        self.launch = Sound('media/launch.wav')
+
+        # self.bg = Background(self)
+        # self.gameobjects.append(self.bg)
+
 
     def remove_blocks(self, x, y):
         self.remove_from_gmap(x - EXPLOSION_SIZE,
@@ -69,7 +82,6 @@ class GameSpace():
 
     def main(self):
         # init gamespace
-        pygame.init()
 
 
         if self.isServer:
@@ -79,9 +91,10 @@ class GameSpace():
             self.gameobjects.append(self.terrain)
             self.gameobjects.append(self.player1)
             self.gameobjects.append(self.player2)
+            # self.bg.update()
+            # pygame.display.flip()
             self.server_start()
         else:
-            print('uhh')
             self.client_start()
 
 
@@ -90,7 +103,10 @@ class GameSpace():
 
     # start game loop
     def game_loop(self):
-        if not all(self.connections):
+
+        if not self.run:
+            if all(self.connections):
+                self.run = True
             return
 
 
@@ -111,9 +127,10 @@ class GameSpace():
                 self.player1.vel[1] += 50
             elif keys[K_a]:
                 self.player1.vel[0] = -1
-                #self.bg.shift_left()
+                # self.bg.shift_left()
             elif keys[K_d]:
                 self.player1.vel[0] = 1
+                # self.bg.shift_right()
             else:
                 self.player1.vel[0] = 0
                     #self.bg.shift_right()
@@ -121,6 +138,7 @@ class GameSpace():
             if event.type == MOUSEBUTTONDOWN or event.type == K_DOWN:
                 mouse = pygame.mouse.get_pressed()
                 if mouse[0] or keys[K_SPACE]:
+                    self.launch.play()
                     pos = self.player1.get_pos()
                     obj = MidBullet.from_local(self, pos, 10)
                     self.gameobjects.append(obj)

@@ -1,9 +1,9 @@
-import pygame
-import numpy as np
-from game.explosion import Explosion
-from game.terrain import *
-import math
-GRAVITY = np.asarray([0, 0.1])
+# import pygame
+# import numpy as np
+# from game.explosion import Explosion
+# from game.terrain import *
+# import math
+# GRAVITY = np.asarray([0, 0.1])
 # EXPLOSION_SIZE = 9
 
 import pygame
@@ -27,6 +27,8 @@ class MidBullet(pygame.sprite.Sprite):
         self.rect.center = self.pos
         self.startx = self.pos[0]
         self.isFiring = True
+
+
 
 
     @staticmethod
