@@ -3,14 +3,16 @@
 # Ben Becker
 
 import pygame
-from terrain import Terrain
+# from terrain import Terrain
 from tank import MidTank
-from mid_bullet import MidBullet
-from background import Background
+# from mid_bullet import MidBullet
+# from background import Background
 from pygame.locals import *
 import time
 
 class GameSpace():
+    def __init__(self, isClient=True):
+        self.isClient = isClient
 
     def get_height(self, x):
         x = x % self.width
@@ -39,7 +41,7 @@ class GameSpace():
 
         # init gameobjects
         self.clock = pygame.time.Clock()
-
+        self.count = 0
         self.terrain = Terrain(gs)
         self.player1 = MidTank(self,MidTank(self, ([50, 300])))
         self.gameobjects = []
@@ -53,6 +55,7 @@ class GameSpace():
         while 1:
             start = time.time()
             self.clock.tick(60)
+            self.count += 1
 
             if self.game_over:
                 return 1
