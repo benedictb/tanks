@@ -10,7 +10,8 @@ from game.background import Background
 from pygame.locals import *
 import time
 from twisted.internet import reactor
-import net.client, net.server
+import net.client as client
+import net.server as server
 
 FIRSTPORT = 50000
 TANKPORT = 50001
@@ -76,7 +77,7 @@ class GameSpace():
             self.gameobjects.append(self.terrain)
             self.gameobjects.append(self.player1)
             self.gameobjects.append(self.player2)
-            self.server_start()
+            # self.server_start()
         else:
             print('uhh')
             self.client_start()
@@ -113,9 +114,9 @@ class GameSpace():
                         pos = self.player1.get_pos()
                         obj = MidBullet.from_local(self, pos, 10)
                         self.gameobjects.append(obj)
-                        self.bulletConnection.transport.write((pos, obj.vel))
+                        # self.bulletConnection.transport.write((pos, obj.vel))
 
-            self.tankConnection.transport.write((self.player1.get_pos(), self.player1.vel))
+            # self.tankConnection.transport.write((self.player1.get_pos(), self.player1.vel))
 
             #blank out screen
             self.screen.fill(self.black)

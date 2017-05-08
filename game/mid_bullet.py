@@ -8,8 +8,8 @@ GRAVITY = np.asarray([0, 0.1])
 
 import pygame
 import numpy as np
-from explosion import Explosion
-from terrain import *
+from game.explosion import Explosion
+from game.terrain import *
 import math
 GRAVITY = np.asarray([0, 0.1])
 EXPLOSION_SIZE = 8*PIXEL_SIZE
