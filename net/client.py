@@ -3,8 +3,8 @@ from twisted.internet.protocol import ClientFactory
 from twisted.internet.protocol import Protocol
 from twisted.internet import reactor
 from twisted.internet.defer import DeferredQueue
-from mid_bullet import *
-from tank import *
+from game.mid_bullet import MidBullet
+from game.tank import MidTank
 import pickle
 
 
