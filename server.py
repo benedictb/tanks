@@ -4,6 +4,7 @@ from twisted.internet.protocol import Protocol
 from twisted.internet import reactor
 from twisted.internet.defer import DeferredQueue
 from mid_bullet import *
+import unicodedata
 
 
 class FirstConnection(Protocol):
@@ -11,12 +12,17 @@ class FirstConnection(Protocol):
         self.gs = gs
 
     def connectionMade(self):
-        data = dict()
-        data['player1'] = self.gs.player1.pos
-        data['player2'] = self.gs.player2.pos
-        data['terrain'] = self.gs.terrain
-        data['wind'] = self.gs.wind
-        self.transport.write(data)
+        self.gs.firstConnection = self
+        data = [0] * 4
+        data[0] = self.gs.player1.pos
+        data[1] = self.gs.player2.pos
+        data[2] = self.gs.gmap.tobytes()
+        data[3] = 0 #self.gs.wind
+        # data = str(data).encode('ascii')
+        # unicodedata.normalize('NFKD', data).encode('ascii', 'ignore')
+        # bytes = str.encode()
+        print(str(data).encode('ascii'))
+        self.transport.write(str(data).encode('ascii'))
         self.gs.connections[0] = True
 
 class BulletConnection(Protocol):
@@ -24,6 +30,7 @@ class BulletConnection(Protocol):
         self.gs = gs
 
     def connectionMade(self):
+        self.gs.bulletConnection = self
         self.gs.connections[1] = True
 
     def dataReceived(self, data):
@@ -36,6 +43,7 @@ class TankConnection(Protocol):
         self.gs = gs
 
     def connectionMade(self):
+        self.gs.tankConnection = self
         self.gs.connections[3] = True
 
 
@@ -51,6 +59,7 @@ class TerrainConnection(Protocol):
         self.gs = gs
 
     def connectionMade(self):
+        self.gs.terrain = self
         self.gs.connections[3] = True
 
     def dataReceived(self, data):
@@ -58,21 +67,21 @@ class TerrainConnection(Protocol):
         self.gs.remove_blocks(data)
 
 
-class FirstFactory(ClientFactory):
+class FirstFactory(Factory):
     def __init__(self, gs):
         self.myconn = FirstConnection(gs)
 
     def buildProtocol(self, addr):
         return self.myconn
 
-class BulletFactory(ClientFactory):
+class BulletFactory(Factory):
     def __init__(self, gs):
         self.myconn = BulletConnection(gs)
 
     def buildProtocol(self, addr):
         return self.myconn
 
-class TankFactory(ClientFactory):
+class TankFactory(Factory):
     def __init__(self, gs):
         self.myconn = TankConnection(gs)
 
@@ -80,7 +89,7 @@ class TankFactory(ClientFactory):
         return self.myconn
 
 
-class TerrainFactory(ClientFactory):
+class TerrainFactory(Factory):
     def __init__(self, gs):
         self.myconn = TerrainConnection(gs)
 

@@ -7,18 +7,21 @@ from mid_bullet import *
 from tank import *
 
 
+
 class FirstConnection(Protocol):
     def __init__(self, gs):
         self.gs = gs
 
     def dataReceived(self, data):
-        self.gs.player2 = MidTank(self.gs, data['player1'])
-        self.gs.player1 = MidTank(self.gs, data['player2'])
+        data = eval(data)
+        self.gs.player2 = MidTank(self.gs, data[0])
+        self.gs.player1 = MidTank(self.gs, data[1])
         self.gs.gameobjects.append(self.gs.player1)
         self.gs.gameobjects.append(self.gs.player2)
-        self.gs.terrain = data['terrain']
+        terrain_bytes = data[2]
+        self.gs.terrain = Terrain.from_gmap(np.fromstring(terrain_bytes,dtype='int'))
         self.gs.gameobjects.append(self.gs.terrain)
-        self.gs.wind = data['wind']
+        self.gs.wind = data[3]
 
 
 class BulletConnection(Protocol):
@@ -54,7 +57,7 @@ class TerrainConnection(Protocol):
         self.gs.remove_blocks(data)
 
 
-class FirstFactory(Factory):
+class FirstFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = FirstConnection(gs)
 
@@ -62,7 +65,7 @@ class FirstFactory(Factory):
         return self.myconn
 
 
-class BulletFactory(Factory):
+class BulletFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = BulletConnection(gs)
 
@@ -70,7 +73,7 @@ class BulletFactory(Factory):
         return self.myconn
 
 
-class TankFactory(Factory):
+class TankFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = TankConnection(gs)
 
@@ -78,7 +81,7 @@ class TankFactory(Factory):
         return self.myconn
 
 
-class TerrainFactory(Factory):
+class TerrainFactory(ClientFactory):
     def __init__(self, gs):
         self.myconn = TerrainConnection(gs)
 

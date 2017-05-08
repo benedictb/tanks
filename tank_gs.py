@@ -67,7 +67,10 @@ class GameSpace():
         self.count = 0
 
         if self.isServer:
-            self.terrain = Terrain(self)
+            self.terrain = Terrain.random(self)
+            # self.terrain.update()
+            # pygame.display.flip()
+
             self.player1 = MidTank(self, ([50, 300]))
             self.player2 = MidTank(self, ([1700, 300]))
             self.gameobjects = []
@@ -110,9 +113,9 @@ class GameSpace():
                         pos = self.player1.get_pos()
                         obj = MidBullet.from_local(self, pos, 10)
                         self.gameobjects.append(obj)
-                        # self.bulletConnection.transport.write((pos, obj.vel))
+                        self.bulletConnection.transport.write((pos, obj.vel))
 
-            # self.tankConnection.transport.write((self.player1.get_pos(), self.player1.vel))
+            self.tankConnection.transport.write((self.player1.get_pos(), self.player1.vel))
 
             #blank out screen
             self.screen.fill(self.black)
@@ -142,9 +145,9 @@ class GameSpace():
             time.sleep(1)
 
     def client_start(self):
-        reactor.connectTCP('localhost',FIRSTPORT, server.FirstFactory(self))
-        reactor.connectTCP('localhost',TANKPORT, server.TankFactory(self))
-        reactor.connectTCP('localhost', BULLETPORT, server.BulletFactory(self))
-        reactor.connectTCP('localhost', TERRAINPORT, server.TerrainFactory(self))
+        self.firstConnection = reactor.connectTCP('localhost',FIRSTPORT, client.FirstFactory(self))
+        self.tankConnection = reactor.connectTCP('localhost',TANKPORT, client.TankFactory(self))
+        self.bulletConnection = reactor.connectTCP('localhost', BULLETPORT, client.BulletFactory(self))
+        self.terrainConnection = reactor.connectTCP('localhost', TERRAINPORT, client.TerrainFactory(self))
 
         reactor.run()

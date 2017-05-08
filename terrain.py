@@ -23,19 +23,32 @@ class Terrain(pygame.sprite.Sprite):
         self.rock = (141, 155, 141, 255)
         self.grass = (48, 219, 48, 255)
         self.black = (0, 0, 0, 0)
+        # self.gmap = gmap
 
-        # Create the terrain
-        self.gen_terrain()
-        self.create_surface()
+    @staticmethod
+    def random(gs):
+        t = Terrain(gs)
+        gmap = t.gen_terrain()
+        t.create_surface(gmap)
+        gs.gmap = gmap
+        return t
+
+    @staticmethod
+    def from_gmap(gs,gmap):
+        t = Terrain(gs)
+        t.create_surface(gmap)
+        gs.gmap = gmap
+        return t
+
 
     def tick(self):
         pass
 
     # IF the cell is valid (cell[0] == True), THEN draw it. gmap is a matrix representing the gamespace
-    def create_surface(self):
-        for i in range(0, len(self.gs.gmap),5):
-            for j in range (0, len(self.gs.gmap[i]),5):
-                cell = self.gs.gmap[i,j]
+    def create_surface(self, gmap):
+        for i in range(0, len(gmap),5):
+            for j in range (0, len(gmap[i]),5):
+                cell = gmap[i,j]
                 if cell == 1:
                     # self.gs.screen.set_at((i,self.screenHeight-j), self.rock)
                     self.image.fill(self.rock, ((i, self.screenHeight - j), (PIXEL_SIZE, PIXEL_SIZE)))
@@ -77,7 +90,7 @@ class Terrain(pygame.sprite.Sprite):
             self.heights = np.floor_divide(np.asarray(self.heights, dtype=int), PIXEL_SIZE)
 
             # This is a map of the tiles
-            gmap = np.zeros((self.screenWidth, self.screenHeight, 1))
+            gmap = np.zeros((self.screenWidth, self.screenHeight))
 
             # The next loops define which sort of tile they are (what color)
             for i, h in enumerate(self.heights):
@@ -98,7 +111,7 @@ class Terrain(pygame.sprite.Sprite):
                     # gmap[i,j,0] = 1
                     gmap[i:i+PIXEL_SIZE, j:j+PIXEL_SIZE] = 3 #self.grass
 
-            self.gs.gmap = gmap
+            return gmap
         except IndexError:
             self.gen_terrain()
 

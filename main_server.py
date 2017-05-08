@@ -4,7 +4,7 @@ from server import *
 
 if __name__ == '__main__':
 
-    gs = GameSpace()
+    gs = GameSpace(isServer=True)
     # gs.server_start()
     gs.main()
 

@@ -57,7 +57,7 @@ class MidBullet(pygame.sprite.Sprite):
         # explode on contact
         else:
             self.gs.remove_blocks(self.pos[0], self.pos[1])
-            # self.gs.terrainConnection.write(self.pos)
+            self.gs.terrainConnection.write(self.pos)
             self.gs.gameobjects.append(Explosion(self.gs, self.pos))
             self.gs.gameobjects.remove(self)
 
