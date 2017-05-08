@@ -17,6 +17,7 @@ class FirstConnection(Protocol):
         self.gs.gameobjects.append(self.gs.player1)
         self.gs.gameobjects.append(self.gs.player2)
         self.gs.terrain = data['terrain']
+        self.gs.gameobjects.append(self.gs.terrain)
         self.gs.wind = data['wind']
 
 
