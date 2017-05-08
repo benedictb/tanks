@@ -55,17 +55,8 @@ class MidBullet(pygame.sprite.Sprite):
             self.rect.center = self.pos
         # explode on contact
         else:
-            self.gs.remove_from_gmap(self.pos[0] - EXPLOSION_SIZE,
-                                     self.pos[0] + EXPLOSION_SIZE,
-                                     self.gs.height - self.pos[1] - EXPLOSION_SIZE,
-                                     self.gs.height - self.pos[1]+EXPLOSION_SIZE)
-
-            # self.gs.terrain.create_surface()
-            self.gs.terrain.remove_blocks(self.pos[0] - EXPLOSION_SIZE,
-                                          self.pos[0] + EXPLOSION_SIZE,
-                                          self.pos[1] - EXPLOSION_SIZE,
-                                          self.pos[1] + EXPLOSION_SIZE)
-
+            self.remove_blocks(self.pos[0], self.pos[1])
+            self.gs.terrainConnection.write(self.pos)
             self.gs.gameobjects.append(Explosion(self.gs, self.pos))
             self.gs.gameobjects.remove(self)
 
@@ -101,3 +92,15 @@ class MidBullet(pygame.sprite.Sprite):
             self.gs.screen.blit(rev, self.rect.center)
         else:
             self.gs.screen.blit(self.image, self.rect.center)
+
+    def remove_blocks(self, x, y):
+        self.gs.remove_from_gmap(x - EXPLOSION_SIZE,
+                                 x + EXPLOSION_SIZE,
+                                 self.gs.height - y - EXPLOSION_SIZE,
+                                 self.gs.height - y + EXPLOSION_SIZE)
+
+        # self.gs.terrain.create_surface()
+        self.gs.terrain.remove_blocks(x - EXPLOSION_SIZE,
+                                      x + EXPLOSION_SIZE,
+                                      y - EXPLOSION_SIZE,
+                                      y + EXPLOSION_SIZE)
