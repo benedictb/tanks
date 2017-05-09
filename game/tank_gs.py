@@ -119,12 +119,13 @@ class GameSpace():
                 mouse = pygame.mouse.get_pressed()
                 if mouse[0]:
                     pos = self.player1.get_pos()
-                    obj = MidBullet.from_local(self, pos, 10)
+                    obj = MidBullet.from_local(self, pos, 10, False)
                     self.gameobjects.append(obj)
 
-                    data = [0] * 2
+                    data = [0] * 3
                     data[0] = pos
                     data[1] = obj.vel
+                    data[2] = True
                     dstring = pickle.dumps(data)
                     self.bulletConnection.transport.write(dstring)
 

@@ -17,7 +17,7 @@ GRAVITY = np.asarray([0, 0.1])
 EXPLOSION_SIZE = 8*PIXEL_SIZE
 
 class MidBullet(pygame.sprite.Sprite):
-    def __init__(self, gs, pos, vel):
+    def __init__(self, gs, pos, vel, isEnemy):
         super().__init__()
         self.gs = gs
         self.image = pygame.image.load('media/mid_bullet.png')
@@ -27,21 +27,22 @@ class MidBullet(pygame.sprite.Sprite):
         self.rect.center = self.pos
         self.startx = self.pos[0]
         self.isFiring = True
+        self.isEnemy = isEnemy
 
 
     @staticmethod
-    def from_local(gs, pos, speed):
+    def from_local(gs, pos, speed, isEnemy):
         x, y = pygame.mouse.get_pos()
         angle = 360 - math.atan2(y - pos[1], x - pos[0]) * 180 / math.pi
         velx = speed * math.cos(math.radians(360 - angle))
         vely = speed * math.sin(math.radians(360 - angle))
         vel = np.asarray([velx, vely])
-        obj = MidBullet(gs,pos,vel)
+        obj = MidBullet(gs,pos,vel, isEnemy)
         return obj
 
     @staticmethod
-    def from_network(gs, pos, vel):
-        obj = MidBullet(gs, pos, vel)
+    def from_network(gs, pos, vel, isEnemy):
+        obj = MidBullet(gs, pos, vel, isEnemy)
         return obj
 
     def tick(self):
@@ -71,17 +72,28 @@ class MidBullet(pygame.sprite.Sprite):
             return 0
         elif self.pos[1] >= 600:
             self.gs.gameobjects.remove(self)
-        # if bullet hits player 2, hit
-        # elif pygame.sprite.collide_rect(self, self.gs.player2) and self.isFiring:
-        #     print("HIT")
-        #     self.isFiring = False
-        #     self.gs.player2.health -= 50
-        #     print("enemy health: " + str(self.gs.player2.health))
-        #     return 1
-        # elif pygame.sprite.collide_rect(self, self.gs.player2):
-        #     return 1
+        if not self.isEnemy:
+            # if bullet hits player 2, hit
+            if pygame.sprite.collide_rect(self, self.gs.player2) and self.isFiring:
+                print("HIT")
+                self.isFiring = False
+                self.gs.player2.health -= 50
+                print("enemy health: " + str(self.gs.player2.health))
+                return 1
+            elif pygame.sprite.collide_rect(self, self.gs.player2):
+                return 1
+        elif self.isEnemy:
+            # if bullet hits player 1, hit
+            if pygame.sprite.collide_rect(self, self.gs.player1) and self.isFiring:
+                print("HIT")
+                self.isFiring = False
+                self.gs.player1.health -= 50
+                print("enemy health: " + str(self.gs.player1.health))
+                return 1
+            elif pygame.sprite.collide_rect(self, self.gs.player1):
+                return 1
         # if bullet hits ground, hit detect
-        elif self.gs.gmap[self.pos[0], self.gs.height - self.pos[1]] != 0:
+        if self.gs.gmap[self.pos[0], self.gs.height - self.pos[1]] != 0:
             self.isFiring = False
             return 1
         # if bullets hits nothing, no hit detect

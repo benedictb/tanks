@@ -53,7 +53,7 @@ class BulletConnection(Protocol):
     def dataReceived(self, data):
         # create bullet locally
         dlist = pickle.loads(data)
-        self.gs.gameobjects.append(MidBullet.from_network(self.gs, dlist[0], dlist[1]))
+        self.gs.gameobjects.append(MidBullet.from_network(self.gs, dlist[0], dlist[1], dlist[2]))
 
 class TankConnection(Protocol):
     def __init__(self, gs):
