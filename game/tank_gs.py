@@ -25,6 +25,8 @@ TANKPORT = 50001
 BULLETPORT = 50002
 TERRAINPORT = 50003
 
+SERVER = 'localhost'
+
 PIXEL_SIZE = 5
 EXPLOSION_SIZE = 8*PIXEL_SIZE
 
@@ -134,8 +136,8 @@ class GameSpace():
             else:
                 outcome = "Lose!"
             myfont = pygame.font.SysFont("monospace", 30)
-            gameover = myfont.render("You " + outcome, 1, self.white)
-            self.screen.blit(gameover, (int(self.width / 2) - 400, int(self.height / 2)))
+            gameover = myfont.render("You " + outcome + ": Press 'q' to quit", 1, self.white)
+            self.screen.blit(gameover, (int(self.width / 2) - 350, int(self.height / 2)))
             pygame.display.flip()
             if self.quit:
                 reactor.stop()
@@ -211,10 +213,10 @@ class GameSpace():
         reactor.run()
 
     def client_start(self):
-        self.firstConnection = reactor.connectTCP('localhost',FIRSTPORT, client.FirstFactory(self))
-        self.tankConnection = reactor.connectTCP('localhost',TANKPORT, client.TankFactory(self))
-        self.bulletConnection = reactor.connectTCP('localhost', BULLETPORT, client.BulletFactory(self))
-        self.terrainConnection = reactor.connectTCP('localhost', TERRAINPORT, client.TerrainFactory(self))
+        self.firstConnection = reactor.connectTCP(SERVER, FIRSTPORT, client.FirstFactory(self))
+        self.tankConnection = reactor.connectTCP(SERVER, TANKPORT, client.TankFactory(self))
+        self.bulletConnection = reactor.connectTCP(SERVER, BULLETPORT, client.BulletFactory(self))
+        self.terrainConnection = reactor.connectTCP(SERVER, TERRAINPORT, client.TerrainFactory(self))
 
         lc = LoopingCall(self.game_loop)
         lc.start(1/60).addErrback(twisted.python.log.err)
