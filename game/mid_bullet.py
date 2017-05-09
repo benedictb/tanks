@@ -1,10 +1,3 @@
-# import pygame
-# import numpy as np
-# from game.explosion import Explosion
-# from game.terrain import *
-# import math
-# GRAVITY = np.asarray([0, 0.1])
-# EXPLOSION_SIZE = 9
 
 from game.explosion import Explosion
 from game.terrain import *
@@ -14,6 +7,8 @@ import pickle
 GRAVITY = np.asarray([0, 0.1])
 EXPLOSION_SIZE = 8*PIXEL_SIZE
 
+# MidBullet because the initial intent was to create multiple tank classes with different bullets.
+# If this had happened, this would become a parent class for each of the bullet types
 class MidBullet(pygame.sprite.Sprite):
     def __init__(self, gs, pos, vel, isEnemy):
         super().__init__()
@@ -27,6 +22,7 @@ class MidBullet(pygame.sprite.Sprite):
         self.isFiring = True
         self.isEnemy = isEnemy
 
+    # If we're creating a bullet locally, we find direction with the mouse
     @staticmethod
     def from_local(gs, pos, speed, isEnemy):
         x, y = pygame.mouse.get_pos()
@@ -37,10 +33,12 @@ class MidBullet(pygame.sprite.Sprite):
         obj = MidBullet(gs,pos,vel, isEnemy)
         return obj
 
+    # If we're creating a bullet via network, we already have the velocity
     @staticmethod
     def from_network(gs, pos, vel, isEnemy):
         obj = MidBullet(gs, pos, vel, isEnemy)
         return obj
+
 
     def tick(self):
         ground = self.gs.height - self.gs.get_height(self.rect.centerx)
@@ -48,30 +46,35 @@ class MidBullet(pygame.sprite.Sprite):
         # if not hit anything, keep going
         if not self.hit_detect():
             acc = GRAVITY
-            self.vel[0] += acc[0]
-            self.vel[1] += acc[1]
-            self.pos[0] += self.vel[0]
-            self.pos[1] += self.vel[1]
+            self.vel += acc # Used numpy objects for easy matrix operations (N dimensionality!)
+            self.pos += self.vel.astype(np.int)
             self.pos[0] = self.pos[0] % self.gs.width
             self.rect.center = self.pos
+        
         # explode on contact
         else:
-            if self.gs.isServer:
-                self.gs.remove_blocks(self.pos[0], self.pos[1])
-                data = pickle.dumps(self.pos)
+            # To avoid double explosions, we only remove blocks on one game, then 
+            # send which blocks to remove to the other. Small overhead for this, only 2 ints of data
+            if self.gs.isServer: 
+                self.gs.remove_blocks(self.pos[0], self.pos[1]) # remove the blocks from the map
+                data = pickle.dumps(self.pos) # serialize the data (might be overkill here but we wanted to be consistent)
                 self.gs.terrainConnection.transport.write(data)
-            self.gs.gameobjects.append(Explosion(self.gs, self.pos))
-            self.gs.gameobjects.remove(self)
+            self.gs.gameobjects.append(Explosion(self.gs, self.pos)) # create a new explosion object as a result
+            self.gs.gameobjects.remove(self) # get rid of the bullet
 
     def hit_detect(self):
         # if bullet is above screen, definitely no hit
 
+        # Don't care if above screen
         if self.pos[1] <= 0:
             return 0
+        # But if its below, kill the bullet
         elif self.pos[1] >= 600:
             self.gs.gameobjects.remove(self)
+
+        # Check if its the enemy
         if not self.isEnemy:
-            # if bullet hits player 2, hit
+            # If bullet hits player 2, hit with 'collide'
             if pygame.sprite.collide_rect(self, self.gs.player2) and self.isFiring:
                 print("HIT")
                 self.isFiring = False
@@ -80,10 +83,12 @@ class MidBullet(pygame.sprite.Sprite):
                 print("Enemy Health: " + str(self.gs.player2.health))
                 print("~~~~~~~~~~~~~~~~~")
                 return 1
+            # If already hit, don't worry about adding more damage
             elif pygame.sprite.collide_rect(self, self.gs.player2):
                 return 1
+        
         elif self.isEnemy:
-            # if bullet hits player 1, hit
+            # if bullet hits player 1, hit with 'collide'
             if pygame.sprite.collide_rect(self, self.gs.player1) and self.isFiring:
                 print("HIT")
                 self.isFiring = False
@@ -93,13 +98,16 @@ class MidBullet(pygame.sprite.Sprite):
                 return 1
             elif pygame.sprite.collide_rect(self, self.gs.player1):
                 return 1
+
         # if bullet hits ground, hit detect
         if self.gs.gmap[self.pos[0], self.gs.height - self.pos[1]] != 0:
             self.isFiring = False
             return 1
+
         # if bullets hits nothing, no hit detect
         else:
             return 0
+
 
     def update(self):
         m = pygame.mouse.get_pos()

@@ -23,26 +23,25 @@ class Terrain(pygame.sprite.Sprite):
         self.rock = (141, 155, 141, 255)
         self.grass = (48, 219, 48, 255)
         self.black = (0, 0, 0, 0)
-        # self.gmap = gmap
 
+    # Either create the map from random.. or from the list of heights
     @staticmethod
     def random(gs):
         t = Terrain(gs)
-        heights = t.gen_terrain()
-        gs.heights = heights
-        gmap = t.gen_gmap(heights)
-        t.create_surface(gmap)
-        gs.gmap = gmap
+        gs.heights = t.gen_terrain()
+        gs.gmap = t.gen_gmap(gs.heights)
+        t.create_surface(gs.gmap)
         return t
 
+    # Heights is a managable amount of data to pass through the network. We can 
+    # create the same map using helper functions
     @staticmethod
     def from_heights(gs, heights):
         t = Terrain(gs)
-        gmap = t.gen_gmap(heights)
-        t.create_surface(gmap)
-        gs.gmap = gmap
+        gs.heights = heights
+        gs.gmap = t.gen_gmap(heights)
+        t.create_surface(gs.gmap)
         return t
-
 
     def tick(self):
         pass
@@ -52,16 +51,13 @@ class Terrain(pygame.sprite.Sprite):
         for i in range(0, len(gmap),5):
             for j in range (0, len(gmap[i]),5):
                 cell = gmap[i,j]
-                if cell == 1:
-                    # self.gs.screen.set_at((i,self.screenHeight-j), self.rock)
+                if cell == 1: # Fill with rock 
                     self.image.fill(self.rock, ((i, self.screenHeight - j), (PIXEL_SIZE, PIXEL_SIZE)))
-                elif cell == 2:
+                elif cell == 2: # with dirt
                     self.image.fill(self.dirt, ((i, self.screenHeight - j), (PIXEL_SIZE, PIXEL_SIZE)))
-                    # self.gs.screen.set_at((i,self.screenHeight-j), self.dirt)
-                elif cell == 3:
+                elif cell == 3: # with grass
                     self.image.fill(self.grass, ((i, self.screenHeight - j), (PIXEL_SIZE, PIXEL_SIZE)))
-                    # self.gs.screen.set_at((i,self.screenHeight-j), self.grass)
-                elif cell == 0:
+                elif cell == 0: # probably redundant but with black
                     self.image.fill(self.black, ((i, self.screenHeight - j), (PIXEL_SIZE, PIXEL_SIZE)))
         self.image.set_alpha(150)
 
@@ -70,7 +66,7 @@ class Terrain(pygame.sprite.Sprite):
 
     def gen_terrain(self):
 
-        # Try generating a map, if it doesn't fit, try again (should'nt happen more than once
+        # Try generating a map, if it doesn't fit, try again (should'nt happen more than once, mayyybe twice 
         self.heights[0] = 100 # Left and right start the same way
         self.heights[-1] = 100
         length = int(self.screenWidth / PIXEL_SIZE)
@@ -119,9 +115,10 @@ class Terrain(pygame.sprite.Sprite):
 
             return gmap
         except IndexError:
-            self.gen_gmap(heights)
+            self.heights = self.gen_terrain()
+            self.gen_gmap(self, self.heights)
 
-    def remove_blocks(self, x1, x2, y1, y2):
+    def remove_terrain_blocks(self, x1, x2, y1, y2):
         self.image.fill(self.black, ((x1, y1), (x2-x1,y2-y1)))
         self.image.set_alpha(0)
 

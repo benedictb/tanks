@@ -34,6 +34,7 @@ class GameSpace():
         self.screen = pygame.display.set_mode(self.size)
         self.black = 0, 0, 0
         self.game_over = False
+
         # init gameobjects
         self.clock = pygame.time.Clock()
         self.count = 0
@@ -52,7 +53,7 @@ class GameSpace():
                                  self.height - y - EXPLOSION_SIZE,
                                  self.height - y + EXPLOSION_SIZE)
 
-        self.terrain.remove_blocks(x - EXPLOSION_SIZE,
+        self.terrain.remove_terrain_blocks(x - EXPLOSION_SIZE,
                                       x + EXPLOSION_SIZE,
                                       y - EXPLOSION_SIZE,
                                       y + EXPLOSION_SIZE)
@@ -86,6 +87,7 @@ class GameSpace():
     # start game loop
     def game_loop(self):
 
+        # Make sure all connections have been made before starting
         if not self.run:
             if all(self.connections):
                 self.run = True
@@ -159,7 +161,6 @@ class GameSpace():
 
         lc = LoopingCall(self.game_loop)
         lc.start(1/60).addErrback(twisted.python.log.err)
-        print(self.connections)
         reactor.run()
 
     def client_start(self):
@@ -170,6 +171,5 @@ class GameSpace():
 
         lc = LoopingCall(self.game_loop)
         lc.start(1/60).addErrback(twisted.python.log.err)
-        print(self.connections)
         reactor.run()
 
