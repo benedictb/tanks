@@ -56,9 +56,10 @@ class MidBullet(pygame.sprite.Sprite):
             self.rect.center = self.pos
         # explode on contact
         else:
-            self.gs.remove_blocks(self.pos[0], self.pos[1])
-            data = pickle.dumps(self.pos)
-            self.gs.terrainConnection.transport.write(data)
+            if self.gs.isServer:
+                self.gs.remove_blocks(self.pos[0], self.pos[1])
+                data = pickle.dumps(self.pos)
+                self.gs.terrainConnection.transport.write(data)
             self.gs.gameobjects.append(Explosion(self.gs, self.pos))
             self.gs.gameobjects.remove(self)
 
