@@ -46,6 +46,7 @@ class GameSpace():
         self.count = 0
         self.loading_tick = 0
         self.run = False
+        self.quit = False
 
 
         # Sound init, music init
@@ -136,8 +137,8 @@ class GameSpace():
             gameover = myfont.render("You " + outcome, 1, self.white)
             self.screen.blit(gameover, (int(self.width / 2) - 400, int(self.height / 2)))
             pygame.display.flip()
-            time.sleep(5)
-            reactor.stop()
+            if self.quit:
+                reactor.stop()
         # read user input
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -150,6 +151,8 @@ class GameSpace():
                 self.player1.vel[0] = -1
             elif keys[K_d]:
                 self.player1.vel[0] = 1
+            elif self.game_over and keys[K_q]:
+                self.quit = True
             else:
                 self.player1.vel[0] = 0
 
@@ -159,29 +162,29 @@ class GameSpace():
                     self.launch.play()
                     self.player1.launch()
 
+        if not self.game_over:
+            # send tank data
+            tankdata = [0] * 2
+            tankdata[0] = self.player1.get_pos()
+            tankdata[1] = self.player1.health
+            ptankdata = pickle.dumps(tankdata)
+            self.tankConnection.transport.write(ptankdata)
 
-        # send tank data
-        tankdata = [0] * 2
-        tankdata[0] = self.player1.get_pos()
-        tankdata[1] = self.player1.health
-        ptankdata = pickle.dumps(tankdata)
-        self.tankConnection.transport.write(ptankdata)
+            #blank out screen
+            self.screen.fill(self.black)
 
-        #blank out screen
-        self.screen.fill(self.black)
+            # call tick on each object
+            for gameobject in self.gameobjects:
+                gameobject.tick()
 
-        # call tick on each object
-        for gameobject in self.gameobjects:
-            gameobject.tick()
+            # update screen
+            for gameobject in self.gameobjects:
+                gameobject.update()
 
-        # update screen
-        for gameobject in self.gameobjects:
-            gameobject.update()
+            pygame.display.flip()
 
-        pygame.display.flip()
-
-        end = time.time()
-        # print(end-start)
+            end = time.time()
+            # print(end-start)
 
     def loading_screen(self):
         if self.isServer:
