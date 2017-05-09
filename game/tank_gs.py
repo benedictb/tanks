@@ -128,6 +128,14 @@ class GameSpace():
         self.count += 1
 
         if self.game_over:
+            if self.player1.health:
+                outcome = "Win!"
+            else:
+                outcome = "Lose!"
+            myfont = pygame.font.SysFont("monospace", 30)
+            gameover = myfont.render("You " + outcome + ": Press Ctrl + C to exit", 1, self.white)
+            self.screen.blit(gameover, (int(self.width / 2) - 400, int(self.height / 2)))
+            pygame.display.flip()
             return 1
         # read user input
         for event in pygame.event.get():
