@@ -42,9 +42,9 @@ class GameSpace():
 
         self.black = 0, 0, 0
         self.white = 255, 255, 255
-        self.game_over = False
         self.count = 0
         self.loading_tick = 0
+        self.game_over = False
         self.run = False
         self.quit = False
         self.cont = False
@@ -120,22 +120,27 @@ class GameSpace():
                     self.create_client_connections()
             return
 
-
-        start = time.time()
-        # self.clock.tick(60)
         self.count += 1
 
+        # if game is over (player dies) stop game, display winner/loser, prompt for quit or restart
         if self.game_over:
+            # if player1 (self) has health left when game ends, you win
             if self.player1.health:
                 outcome = "Win!"
             else:
                 outcome = "Lose!"
+
+            # display outcome
             myfont = pygame.font.SysFont("monospace", 30)
             gameover = myfont.render("You " + outcome + ": Press 'q' to quit, Server press 'r' to restart", 1, self.white)
             self.screen.blit(gameover, (int(self.width / 2) - 350, int(self.height / 2)))
             pygame.display.flip()
+
+            # if player hits 'q', stop reactor loop and program exits
             if self.quit:
                 reactor.stop()
+
+            # if player hits 'r', restart game by resetting all objects and resend 'first connection' data
             elif self.cont:
                 if self.isServer:
                     self.restart_game()
@@ -144,8 +149,6 @@ class GameSpace():
                     self.cont = False
                 else:
                     pass
-
-
 
         # read user input
         for event in pygame.event.get():
@@ -172,6 +175,7 @@ class GameSpace():
                     self.launch.play()
                     self.player1.launch()
 
+        # while the game is not over, continue sending tank data and updating the screen
         if not self.game_over:
             # send tank data
             tankdata = [0] * 2
@@ -192,9 +196,6 @@ class GameSpace():
                 gameobject.update()
 
             pygame.display.flip()
-
-            end = time.time()
-            # print(end-start)
 
     def loading_screen(self):
         if self.isServer:
@@ -235,7 +236,10 @@ class GameSpace():
         reactor.listenTCP(TERRAINPORT, server.TerrainFactory(self))
 
     def restart_game(self):
+        # clear all game objects from list
         self.gameobjects.clear()
+
+        # reinstantiate all standard game objects
         self.terrain = Terrain.random(self)
         self.player1 = MidTank(self, ([50, 300]))
         self.player2 = MidTank(self, ([1700, 300]))
@@ -243,6 +247,7 @@ class GameSpace():
         self.wind = np.asarray((random.uniform(-.05, .05), random.uniform(-.05, .05)))
         self.windarrow = Wind(self, self.wind)
 
+        # add all of the new game objects to the list
         self.gameobjects.append(self.terrain)
         self.gameobjects.append(self.bars)
         self.gameobjects.append(self.player1)

@@ -23,17 +23,26 @@ class MidTank(pygame.sprite.Sprite):
         print(self.rect.size)
 
     def tick(self):
+        # apply acceleration to velocity
         self.vel += self.acc
+
+        # apply velocity to position
         self.pos += self.vel.astype(np.int)
+
+        # apply wind to x position
         self.pos[0] = self.pos[0] % self.gs.width
 
         h = self.gs.get_height(self.pos[0]+25)
 
+        # if on ground, tied height to ground + no y velocity
         if self.pos[1] >= self.gs.height - 45 - h:
             self.pos[1] = (self.gs.height-45) - h
             self.vel[1] = 0
 
+        # set sprite center to position
         self.rect.center = self.pos
+
+        # if health is 0, game over. Remove object from game
         if self.health <= 0:
             self.gs.gameobjects.remove(self)
             self.gs.game_over = True
