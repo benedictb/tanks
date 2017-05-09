@@ -133,10 +133,11 @@ class GameSpace():
             else:
                 outcome = "Lose!"
             myfont = pygame.font.SysFont("monospace", 30)
-            gameover = myfont.render("You " + outcome + ": Press Ctrl + C to exit", 1, self.white)
+            gameover = myfont.render("You " + outcome, 1, self.white)
             self.screen.blit(gameover, (int(self.width / 2) - 400, int(self.height / 2)))
             pygame.display.flip()
-            return 1
+            time.sleep(5)
+            reactor.stop()
         # read user input
         for event in pygame.event.get():
             if event.type == QUIT:
