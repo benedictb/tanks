@@ -22,6 +22,7 @@ class FirstConnection(Protocol):
         self.gs.connections[0] = True
 
     def dataReceived(self, data):
+        self.gs.gameobjects.clear()
         dlist = pickle.loads(data)
         # print(dlist)
         # print(dir(self.gs))
@@ -37,6 +38,7 @@ class FirstConnection(Protocol):
         self.gs.gameobjects.append(self.bars)
         self.gs.gameobjects.append(self.gs.player1)
         self.gs.gameobjects.append(self.gs.player2)
+        self.gs.game_over = False
 
 
 class BulletConnection(Protocol):

@@ -38,8 +38,6 @@ class GameSpace():
         self.screen = pygame.display.set_mode(self.size)
         self.clock = pygame.time.Clock()
 
-
-
         self.black = 0, 0, 0
         self.white = 255, 255, 255
         self.game_over = False
@@ -47,6 +45,7 @@ class GameSpace():
         self.loading_tick = 0
         self.run = False
         self.quit = False
+        self.cont = False
 
 
         # Sound init, music init
@@ -96,20 +95,11 @@ class GameSpace():
     def main(self):
         # set up client and server respectively
         if self.isServer:
-            self.terrain = Terrain.random(self)
-            self.player1 = MidTank(self, ([50, 300]))
-            self.player2 = MidTank(self, ([1700, 300]))
-            self.bars = ErrorBars(self)
-            self.wind = np.asarray((random.uniform(-.05,.05), random.uniform(-.05,.05)))
-            self.windarrow = Wind(self, self.wind)
-
-            self.gameobjects.append(self.terrain)
-            self.gameobjects.append(self.bars)
-            self.gameobjects.append(self.player1)
-            self.gameobjects.append(self.player2)
-            self.gameobjects.append(self.windarrow)
+            self.restart_game()
+            self.create_server_connections()
             self.server_start()
         else:
+            self.create_client_connections()
             self.client_start()
 
     # start game loop
@@ -121,6 +111,11 @@ class GameSpace():
             self.loading_screen()
             if all(self.connections):
                 self.run = True
+
+            for event in pygame.event.get():
+                keys = pygame.key.get_pressed()
+                if keys[K_r]:
+                    self.create_client_connections()
             return
 
 
@@ -139,6 +134,17 @@ class GameSpace():
             pygame.display.flip()
             if self.quit:
                 reactor.stop()
+            elif self.cont:
+                if self.isServer:
+                    self.restart_game()
+                    self.firstConnection.connectionMade()
+                    self.game_over = False
+                    self.cont = False
+                else:
+                    pass
+
+
+
         # read user input
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -153,6 +159,8 @@ class GameSpace():
                 self.player1.vel[0] = 1
             elif self.game_over and keys[K_q]:
                 self.quit = True
+            elif keys[K_r]:
+                self.cont = True
             else:
                 self.player1.vel[0] = 0
 
@@ -201,22 +209,40 @@ class GameSpace():
         pygame.display.flip()
 
     def server_start(self):
-        reactor.listenTCP(FIRSTPORT, server.FirstFactory(self))
-        reactor.listenTCP(TANKPORT, server.TankFactory(self))
-        reactor.listenTCP(BULLETPORT, server.BulletFactory(self))
-        reactor.listenTCP(TERRAINPORT, server.TerrainFactory(self))
-
         lc = LoopingCall(self.game_loop)
         lc.start(1/60).addErrback(twisted.python.log.err)
         reactor.run()
 
     def client_start(self):
+        lc = LoopingCall(self.game_loop)
+        lc.start(1/60).addErrback(twisted.python.log.err)
+        reactor.run()
+
+    def create_client_connections(self):
+        self.connections = [False] * 4
         self.firstConnection = reactor.connectTCP('localhost',FIRSTPORT, client.FirstFactory(self))
         self.tankConnection = reactor.connectTCP('localhost',TANKPORT, client.TankFactory(self))
         self.bulletConnection = reactor.connectTCP('localhost', BULLETPORT, client.BulletFactory(self))
         self.terrainConnection = reactor.connectTCP('localhost', TERRAINPORT, client.TerrainFactory(self))
 
-        lc = LoopingCall(self.game_loop)
-        lc.start(1/60).addErrback(twisted.python.log.err)
-        reactor.run()
+    def create_server_connections(self):
+        self.connections = [False] * 4
+        reactor.listenTCP(FIRSTPORT, server.FirstFactory(self))
+        reactor.listenTCP(TANKPORT, server.TankFactory(self))
+        reactor.listenTCP(BULLETPORT, server.BulletFactory(self))
+        reactor.listenTCP(TERRAINPORT, server.TerrainFactory(self))
 
+    def restart_game(self):
+        self.gameobjects.clear()
+        self.terrain = Terrain.random(self)
+        self.player1 = MidTank(self, ([50, 300]))
+        self.player2 = MidTank(self, ([1700, 300]))
+        self.bars = ErrorBars(self)
+        self.wind = np.asarray((random.uniform(-.05, .05), random.uniform(-.05, .05)))
+        self.windarrow = Wind(self, self.wind)
+
+        self.gameobjects.append(self.terrain)
+        self.gameobjects.append(self.bars)
+        self.gameobjects.append(self.player1)
+        self.gameobjects.append(self.player2)
+        self.gameobjects.append(self.windarrow)

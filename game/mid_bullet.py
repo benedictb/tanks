@@ -65,7 +65,12 @@ class MidBullet(pygame.sprite.Sprite):
                 data = pickle.dumps(self.pos) # serialize the data (might be overkill here but we wanted to be consistent)
                 self.gs.terrainConnection.transport.write(data)
             self.gs.gameobjects.append(Explosion(self.gs, self.pos)) # create a new explosion object as a result
-            self.gs.gameobjects.remove(self) # get rid of the bullet
+
+            # If there are too many bullets on the screen this might throw and exception
+            try:
+                self.gs.gameobjects.remove(self) # get rid of the bullet
+            except ValueError:
+                pass
 
     def hit_detect(self):
         # if bullet is above screen, definitely no hit
