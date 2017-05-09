@@ -31,14 +31,20 @@ class GameSpace():
         self.connections = [False] * 4
         self.gameobjects = []
         self.size = self.width, self.height = 1750, 600
-        self.screen = pygame.display.set_mode(self.size)
-        self.black = 0, 0, 0
-        self.game_over = False
 
-        # init gameobjects
+        self.screen = pygame.display.set_mode(self.size)
         self.clock = pygame.time.Clock()
+
+
+        self.black = 0, 0, 0
+        self.white = 255, 255, 255
+        self.game_over = False
         self.count = 0
+        self.loading_tick = 0
         self.run = False
+
+
+        # Sound init, music init
         pygame.mixer.pre_init(22100, -16, 1, 512)
         pygame.mixer.init()
         pygame.init()
@@ -46,6 +52,17 @@ class GameSpace():
         pygame.mixer.music.play()
         self.explode = Sound('media/explode.wav')
         self.launch = Sound('media/launch.wav')
+
+        myfont = pygame.font.SysFont("monospace", 15)
+
+        # render text
+        self.dot1 = myfont.render("Waiting for connection.", 1, self.white)
+        self.dot2 = myfont.render("Waiting for connection..", 1, self.white)
+        self.dot3 = myfont.render("Waiting for connection...", 1, self.white)
+        self.clientmsg = myfont.render("Connection not found. If you're the client, "
+                                       "make sure that the server is running and the port & address"
+                                       " are correct, and then restart.", 1, self.white)
+
 
     def remove_blocks(self, x, y):
         self.remove_from_gmap(x - EXPLOSION_SIZE,
@@ -92,6 +109,8 @@ class GameSpace():
 
         # Make sure all connections have been made before starting
         if not self.run:
+            self.loading_tick += 1
+            self.loading_screen()
             if all(self.connections):
                 self.run = True
             return
@@ -147,6 +166,20 @@ class GameSpace():
 
         end = time.time()
         # print(end-start)
+
+    def loading_screen(self):
+        if self.isServer:
+            self.screen.fill(self.black)
+            numdots = (int(self.loading_tick/30) % 3) + 1
+            if numdots == 1:
+                self.screen.blit(self.dot1, (int(self.width/2), int(self.height/2)))
+            elif numdots == 2:
+                self.screen.blit(self.dot2, (int(self.width/2), int(self.height/2)))
+            elif numdots == 3:
+                self.screen.blit(self.dot3, (int(self.width/2), int(self.height/2)))
+        else:
+            self.screen.blit(self.clientmsg, (10,10))
+        pygame.display.flip()
 
     def server_start(self):
         reactor.listenTCP(FIRSTPORT, server.FirstFactory(self))

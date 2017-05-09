@@ -17,6 +17,7 @@ class ErrorBars(pygame.sprite.Sprite):
         self.theirhealth = self.gs.player2.health
 
         self.red = (239, 11, 11)
+        ## Got text interface from stackoverflow
         myfont = pygame.font.SysFont("monospace", 15)
 
         # render text
@@ -36,6 +37,8 @@ class ErrorBars(pygame.sprite.Sprite):
             self.surface.fill((0,0,0))
             self.myhealth = self.gs.player1.health
             self.theirhealth = self.gs.player2.health
+
+            # Grabbed this error bar expression from stackoverflow as well
             mybar = int(max(min(self.myhealth / float(MAXHEALTH) * BARWIDTH, BARWIDTH), 0))
             thembar = int(max(min(self.theirhealth / float(MAXHEALTH) * BARWIDTH, BARWIDTH), 0))
             pygame.draw.rect(self.surface, self.red, (self.myx, self.Y, mybar, BARHEIGHT), 0)
