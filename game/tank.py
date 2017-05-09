@@ -1,7 +1,9 @@
-from game.terrain import *
+from game.terrain import Terrain
+import pygame
 import numpy as np
-from game.mid_bullet import MidBullet
 import pickle
+
+from game.mid_bullet import MidBullet
 
 GRAVITY = np.asarray([0, .1])
 MAXBULLET = 5

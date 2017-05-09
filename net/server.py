@@ -1,7 +1,9 @@
+import pickle
+
 from twisted.internet.protocol import Factory
 from twisted.internet.protocol import Protocol
+
 from game.mid_bullet import MidBullet
-import pickle
 
 
 class FirstConnection(Protocol):

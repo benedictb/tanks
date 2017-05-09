@@ -3,7 +3,7 @@
 import pygame
 import numpy as np
 import random
-import time
+
 PIXEL_SIZE = 5
 ROCK_LEVEL = 5
 

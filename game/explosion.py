@@ -1,5 +1,4 @@
 import pygame
-from pygame.mixer import Sound
 
 class Explosion(pygame.sprite.Sprite):
     def __init__(self,gs, pos):

@@ -1,9 +1,12 @@
-
-from game.explosion import Explosion
-from game.terrain import *
+import numpy as np
+import pygame
 import math
 import pickle
 
+from game.explosion import Explosion
+from game.terrain import Terrain
+
+PIXEL_SIZE = 5
 GRAVITY = np.asarray([0, 0.1])
 EXPLOSION_SIZE = 8*PIXEL_SIZE
 

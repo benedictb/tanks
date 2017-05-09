@@ -1,9 +1,11 @@
+import pickle
+
 from twisted.internet.protocol import ClientFactory
 from twisted.internet.protocol import Protocol
+
 from game.mid_bullet import MidBullet
 from game.tank import MidTank
-import pickle
-from game.terrain import *
+from game.terrain import Terrain
 from game.health import ErrorBars
 from game.wind import Wind
 

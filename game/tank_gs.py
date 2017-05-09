@@ -2,23 +2,25 @@
 # Thomas Franceschi
 # Ben Becker
 
+import numpy as np
+import pickle
+import random
+
 import pygame
-from game.terrain import Terrain
-from game.tank import MidTank
-from game.mid_bullet import MidBullet
 from pygame.locals import *
-import time
+from pygame.mixer import Sound
+
+import twisted
 from twisted.internet import reactor
+from twisted.internet.task import LoopingCall
+
 import net.client as client
 import net.server as server
-from twisted.internet.task import LoopingCall
-import pickle
-import twisted
-from pygame.mixer import Sound
+
+from game.terrain import Terrain
+from game.tank import MidTank
 from game.health import ErrorBars
-import numpy as np
 from game.wind import Wind
-import random
 
 FIRSTPORT = 50000
 TANKPORT = 50001
