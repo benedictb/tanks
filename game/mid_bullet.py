@@ -55,7 +55,12 @@ class MidBullet(pygame.sprite.Sprite):
         else:
             # To avoid double explosions, we only remove blocks on one game, then 
             # send which blocks to remove to the other. Small overhead for this, only 2 ints of data
-            if self.gs.isServer: 
+            if self.isEnemy:
+                self.gs.player2.bcount -= 1
+            else:
+                self.gs.player1.bcount -= 1
+
+            if self.gs.isServer:
                 self.gs.remove_blocks(self.pos[0], self.pos[1]) # remove the blocks from the map
                 data = pickle.dumps(self.pos) # serialize the data (might be overkill here but we wanted to be consistent)
                 self.gs.terrainConnection.transport.write(data)

@@ -1,8 +1,10 @@
 from game.terrain import *
 import numpy as np
+from game.mid_bullet import MidBullet
+import pickle
 
 GRAVITY = np.asarray([0, 2])
-
+MAXBULLET = 5
 
 class MidTank(pygame.sprite.Sprite):
     def __init__(self, gs, pos):
@@ -15,6 +17,8 @@ class MidTank(pygame.sprite.Sprite):
         self.vel = np.asarray([0, 0])
         self.acc = GRAVITY
         self.health = 1000
+        self.bcount = 0
+
         print(self.rect.size)
 
     def tick(self):
@@ -44,3 +48,17 @@ class MidTank(pygame.sprite.Sprite):
             self.gs.screen.blit(rev, self.rect.center)
         else:
             self.gs.screen.blit(self.image, self.rect.center)
+
+    def launch(self):
+        if self.bcount < MAXBULLET:
+            self.bcount+=1
+            pos = self.get_pos()
+            obj = MidBullet.from_local(self.gs, pos, 10, False)
+            self.gs.gameobjects.append(obj)
+
+            data = [0] * 3
+            data[0] = pos
+            data[1] = obj.vel
+            data[2] = True
+            dstring = pickle.dumps(data)
+            self.gs.bulletConnection.transport.write(dstring)

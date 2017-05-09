@@ -122,16 +122,8 @@ class GameSpace():
                 mouse = pygame.mouse.get_pressed()
                 if mouse[0] or keys[K_SPACE]:
                     self.launch.play()
-                    pos = self.player1.get_pos()
-                    obj = MidBullet.from_local(self, pos, 10, False)
-                    self.gameobjects.append(obj)
+                    self.player1.launch()
 
-                    data = [0] * 3
-                    data[0] = pos
-                    data[1] = obj.vel
-                    data[2] = True
-                    dstring = pickle.dumps(data)
-                    self.bulletConnection.transport.write(dstring)
 
         # send tank data
         tankdata = [0] * 2
