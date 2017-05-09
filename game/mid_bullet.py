@@ -45,7 +45,7 @@ class MidBullet(pygame.sprite.Sprite):
 
         # if not hit anything, keep going
         if not self.hit_detect():
-            acc = GRAVITY
+            acc = GRAVITY + self.gs.wind
             self.vel += acc # Used numpy objects for easy matrix operations (N dimensionality!)
             self.pos += self.vel.astype(np.int)
             self.pos[0] = self.pos[0] % self.gs.width

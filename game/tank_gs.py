@@ -16,6 +16,9 @@ import pickle
 import twisted
 from pygame.mixer import Sound
 from game.health import ErrorBars
+import numpy as np
+from game.wind import Wind
+import random
 
 FIRSTPORT = 50000
 TANKPORT = 50001
@@ -34,6 +37,7 @@ class GameSpace():
 
         self.screen = pygame.display.set_mode(self.size)
         self.clock = pygame.time.Clock()
+
 
 
         self.black = 0, 0, 0
@@ -95,11 +99,14 @@ class GameSpace():
             self.player1 = MidTank(self, ([50, 300]))
             self.player2 = MidTank(self, ([1700, 300]))
             self.bars = ErrorBars(self)
+            self.wind = np.asarray((random.uniform(-.05,.05), random.uniform(-.05,.05)))
+            self.windarrow = Wind(self, self.wind)
 
             self.gameobjects.append(self.terrain)
             self.gameobjects.append(self.bars)
             self.gameobjects.append(self.player1)
             self.gameobjects.append(self.player2)
+            self.gameobjects.append(self.windarrow)
             self.server_start()
         else:
             self.client_start()
@@ -129,7 +136,7 @@ class GameSpace():
 
             keys = pygame.key.get_pressed()
             if keys[K_w]:
-                self.player1.vel[1] += 50
+                self.player1.vel[1] += 3
             elif keys[K_a]:
                 self.player1.vel[0] = -1
             elif keys[K_d]:

@@ -5,6 +5,7 @@ from game.tank import MidTank
 import pickle
 from game.terrain import *
 from game.health import ErrorBars
+from game.wind import Wind
 
 FIRSTPORT = 50000
 TANKPORT = 50001
@@ -29,12 +30,13 @@ class FirstConnection(Protocol):
         self.gs.player2 = MidTank(self.gs, dlist[0])
         self.gs.player1 = MidTank(self.gs, dlist[1])
         self.bars = ErrorBars(self.gs)
+        self.gs.wind = dlist[3]
+        self.gs.windarrow = Wind(self.gs, self.gs.wind)
 
         self.gs.gameobjects.append(self.gs.terrain)
         self.gs.gameobjects.append(self.bars)
         self.gs.gameobjects.append(self.gs.player1)
         self.gs.gameobjects.append(self.gs.player2)
-        self.gs.wind = dlist[3]
 
 
 class BulletConnection(Protocol):

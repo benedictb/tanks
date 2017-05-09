@@ -14,7 +14,7 @@ class FirstConnection(Protocol):
         data[0] = self.gs.player1.pos
         data[1] = self.gs.player2.pos
         data[2] = self.gs.heights
-        data[3] = 0 #self.gs.wind
+        data[3] = self.gs.wind
 
         dstring = pickle.dumps(data)
         self.transport.write(dstring)

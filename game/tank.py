@@ -3,7 +3,7 @@ import numpy as np
 from game.mid_bullet import MidBullet
 import pickle
 
-GRAVITY = np.asarray([0, 2])
+GRAVITY = np.asarray([0, .1])
 MAXBULLET = 5
 
 class MidTank(pygame.sprite.Sprite):
@@ -14,7 +14,7 @@ class MidTank(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = pos[0]
         self.gs = gs
-        self.vel = np.asarray([0, 0])
+        self.vel = np.asarray([0, 0],dtype=np.float)
         self.acc = GRAVITY
         self.health = 1000
         self.bcount = 0
@@ -23,7 +23,7 @@ class MidTank(pygame.sprite.Sprite):
 
     def tick(self):
         self.vel += self.acc
-        self.pos += self.vel
+        self.pos += self.vel.astype(np.int)
         self.pos[0] = self.pos[0] % self.gs.width
 
         h = self.gs.get_height(self.pos[0]+25)
