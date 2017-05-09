@@ -6,8 +6,6 @@
 # GRAVITY = np.asarray([0, 0.1])
 # EXPLOSION_SIZE = 9
 
-import pygame
-import numpy as np
 from game.explosion import Explosion
 from game.terrain import *
 import math
@@ -28,9 +26,6 @@ class MidBullet(pygame.sprite.Sprite):
         self.startx = self.pos[0]
         self.isFiring = True
         self.isEnemy = isEnemy
-
-
-
 
     @staticmethod
     def from_local(gs, pos, speed, isEnemy):
@@ -80,7 +75,9 @@ class MidBullet(pygame.sprite.Sprite):
                 print("HIT")
                 self.isFiring = False
                 self.gs.player2.health -= 50
-                print("enemy health: " + str(self.gs.player2.health))
+                print("Player Health: " + str(self.gs.player1.health))
+                print("Enemy Health: " + str(self.gs.player2.health))
+                print("~~~~~~~~~~~~~~~~~")
                 return 1
             elif pygame.sprite.collide_rect(self, self.gs.player2):
                 return 1
@@ -90,7 +87,8 @@ class MidBullet(pygame.sprite.Sprite):
                 print("HIT")
                 self.isFiring = False
                 self.gs.player1.health -= 50
-                print("enemy health: " + str(self.gs.player1.health))
+                print("Player Health: " + str(self.gs.player1.health))
+                print("Enemy Health: " + str(self.gs.player2.health))
                 return 1
             elif pygame.sprite.collide_rect(self, self.gs.player1):
                 return 1

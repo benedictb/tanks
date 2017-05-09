@@ -1,13 +1,9 @@
-from twisted.internet.protocol import Factory
 from twisted.internet.protocol import ClientFactory
 from twisted.internet.protocol import Protocol
-from twisted.internet import reactor
-from twisted.internet.defer import DeferredQueue
 from game.mid_bullet import MidBullet
 from game.tank import MidTank
 import pickle
 from game.terrain import *
-import pygame
 
 FIRSTPORT = 50000
 TANKPORT = 50001
@@ -36,11 +32,6 @@ class FirstConnection(Protocol):
         self.gs.gameobjects.append(self.gs.terrain)
         self.gs.wind = dlist[3]
 
-        # self.gs.tankConnection = reactor.connectTCP('localhost', TANKPORT, TankFactory(self))
-        # self.gs.bulletConnection = reactor.connectTCP('localhost', BULLETPORT, BulletFactory(self))
-        # self.gs.terrainConnection = reactor.connectTCP('localhost', TERRAINPORT, TerrainFactory(self))
-
-
 
 class BulletConnection(Protocol):
     def __init__(self, gs):
@@ -54,6 +45,7 @@ class BulletConnection(Protocol):
         # create bullet locally
         dlist = pickle.loads(data)
         self.gs.gameobjects.append(MidBullet.from_network(self.gs, dlist[0], dlist[1], dlist[2]))
+
 
 class TankConnection(Protocol):
     def __init__(self, gs):

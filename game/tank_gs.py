@@ -6,7 +6,6 @@ import pygame
 from game.terrain import Terrain
 from game.tank import MidTank
 from game.mid_bullet import MidBullet
-from game.background import Background
 from pygame.locals import *
 import time
 from twisted.internet import reactor
@@ -47,17 +46,12 @@ class GameSpace():
         self.explode = Sound('media/explode.wav')
         self.launch = Sound('media/launch.wav')
 
-        # self.bg = Background(self)
-        # self.gameobjects.append(self.bg)
-
-
     def remove_blocks(self, x, y):
         self.remove_from_gmap(x - EXPLOSION_SIZE,
                                  x + EXPLOSION_SIZE,
                                  self.height - y - EXPLOSION_SIZE,
                                  self.height - y + EXPLOSION_SIZE)
 
-        # self.terrain.create_surface(self.gmap)
         self.terrain.remove_blocks(x - EXPLOSION_SIZE,
                                       x + EXPLOSION_SIZE,
                                       y - EXPLOSION_SIZE,
@@ -65,25 +59,19 @@ class GameSpace():
 
     def get_height(self, x):
         x = x % self.width
-        col =  [1 if i else 0 for i in self.gmap[x,:] ]
-        # print(col)
-        # h = 1
+        col = [1 if i else 0 for i in self.gmap[x,:] ]
+
         for i in range(0, self.height):
-            # print(i)
             if not col[i]:
                 return i
         return 1
 
-        # col = [1 for i in self.gmap[x,:] if i]
-        # return sum(col)
 
     def remove_from_gmap(self,x1,x2,y1,y2):
         self.gmap[x1:x2,y1:y2] = 0
 
     def main(self):
-        # init gamespace
-
-
+        # set up client and server respectively
         if self.isServer:
             self.terrain = Terrain.random(self)
             self.player1 = MidTank(self, ([50, 300]))
@@ -91,15 +79,9 @@ class GameSpace():
             self.gameobjects.append(self.terrain)
             self.gameobjects.append(self.player1)
             self.gameobjects.append(self.player2)
-            # self.bg.update()
-            # pygame.display.flip()
             self.server_start()
         else:
             self.client_start()
-
-
-        # pygame.key.set_repeat(1, 30)
-
 
     # start game loop
     def game_loop(self):
@@ -123,17 +105,13 @@ class GameSpace():
 
             keys = pygame.key.get_pressed()
             if keys[K_w]:
-                #print("jump!")
                 self.player1.vel[1] += 50
             elif keys[K_a]:
                 self.player1.vel[0] = -1
-                # self.bg.shift_left()
             elif keys[K_d]:
                 self.player1.vel[0] = 1
-                # self.bg.shift_right()
             else:
                 self.player1.vel[0] = 0
-                    #self.bg.shift_right()
 
             if event.type == MOUSEBUTTONDOWN or event.type == K_DOWN:
                 mouse = pygame.mouse.get_pressed()
@@ -171,7 +149,7 @@ class GameSpace():
         pygame.display.flip()
 
         end = time.time()
-        print(end-start)
+        # print(end-start)
 
     def server_start(self):
         reactor.listenTCP(FIRSTPORT, server.FirstFactory(self))
@@ -179,31 +157,16 @@ class GameSpace():
         reactor.listenTCP(BULLETPORT, server.BulletFactory(self))
         reactor.listenTCP(TERRAINPORT, server.TerrainFactory(self))
 
-        # while not all(self.connections):
-        #     print(self.connections)
-        #     time.sleep(1)
-
-        # if not self.run:
-        #     if all(self.connections):
-        #         self.run = True
-        #     return
-
         lc = LoopingCall(self.game_loop)
         lc.start(1/60).addErrback(twisted.python.log.err)
         print(self.connections)
         reactor.run()
-
-
 
     def client_start(self):
         self.firstConnection = reactor.connectTCP('localhost',FIRSTPORT, client.FirstFactory(self))
         self.tankConnection = reactor.connectTCP('localhost',TANKPORT, client.TankFactory(self))
         self.bulletConnection = reactor.connectTCP('localhost', BULLETPORT, client.BulletFactory(self))
         self.terrainConnection = reactor.connectTCP('localhost', TERRAINPORT, client.TerrainFactory(self))
-
-        # while not all(self.connections):
-        #     print(self.connections)
-        #     time.sleep(1)
 
         lc = LoopingCall(self.game_loop)
         lc.start(1/60).addErrback(twisted.python.log.err)
