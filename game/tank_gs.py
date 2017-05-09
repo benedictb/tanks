@@ -15,7 +15,7 @@ from twisted.internet.task import LoopingCall
 import pickle
 import twisted
 from pygame.mixer import Sound
-
+from game.health import ErrorBars
 
 FIRSTPORT = 50000
 TANKPORT = 50001
@@ -77,7 +77,10 @@ class GameSpace():
             self.terrain = Terrain.random(self)
             self.player1 = MidTank(self, ([50, 300]))
             self.player2 = MidTank(self, ([1700, 300]))
+            self.bars = ErrorBars(self)
+
             self.gameobjects.append(self.terrain)
+            self.gameobjects.append(self.bars)
             self.gameobjects.append(self.player1)
             self.gameobjects.append(self.player2)
             self.server_start()

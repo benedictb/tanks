@@ -4,6 +4,7 @@ from game.mid_bullet import MidBullet
 from game.tank import MidTank
 import pickle
 from game.terrain import *
+from game.health import ErrorBars
 
 FIRSTPORT = 50000
 TANKPORT = 50001
@@ -23,13 +24,16 @@ class FirstConnection(Protocol):
         dlist = pickle.loads(data)
         # print(dlist)
         # print(dir(self.gs))
-        self.gs.player2 = MidTank(self.gs, dlist[0])
-        self.gs.player1 = MidTank(self.gs, dlist[1])
-        self.gs.gameobjects.append(self.gs.player1)
-        self.gs.gameobjects.append(self.gs.player2)
         heights = dlist[2]
         self.gs.terrain = Terrain.from_heights(self.gs, heights)
+        self.gs.player2 = MidTank(self.gs, dlist[0])
+        self.gs.player1 = MidTank(self.gs, dlist[1])
+        self.bars = ErrorBars(self.gs)
+
         self.gs.gameobjects.append(self.gs.terrain)
+        self.gs.gameobjects.append(self.bars)
+        self.gs.gameobjects.append(self.gs.player1)
+        self.gs.gameobjects.append(self.gs.player2)
         self.gs.wind = dlist[3]
 
 
