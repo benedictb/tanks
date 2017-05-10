@@ -1,4 +1,6 @@
 # TANKS
+Benedict Becker
+Thomas Franceschi
 
 ![TANKS](./media/mid_tank.png)
 
