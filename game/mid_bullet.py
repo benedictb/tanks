@@ -1,14 +1,13 @@
+from game.constants import *
 import numpy as np
 import pygame
 import math
 import pickle
 
+
 from game.explosion import Explosion
 from game.terrain import Terrain
 
-PIXEL_SIZE = 5
-GRAVITY = np.asarray([0, 0.1])
-EXPLOSION_SIZE = 8*PIXEL_SIZE
 
 # MidBullet because the initial intent was to create multiple tank classes with different bullets.
 # If this had happened, this would become a parent class for each of the bullet types

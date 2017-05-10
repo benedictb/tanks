@@ -1,3 +1,4 @@
+from game.constants import *
 from game.terrain import Terrain
 import pygame
 import numpy as np
@@ -5,9 +6,6 @@ import pickle
 
 from game.mid_bullet import MidBullet
 
-GRAVITY = np.asarray([0, .1])
-MAXBULLET = 5
-HEALTH = 1000
 
 class MidTank(pygame.sprite.Sprite):
     def __init__(self, gs, pos):
@@ -19,7 +17,7 @@ class MidTank(pygame.sprite.Sprite):
         self.gs = gs
         self.vel = np.asarray([0, 0],dtype=np.float)
         self.acc = GRAVITY
-        self.health = HEALTH
+        self.health = MAXHEALTH
         self.bcount = 0
 
         print(self.rect.size)

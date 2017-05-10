@@ -1,11 +1,9 @@
 #! /usr/bin/python3
 
+from game.constants import *
 import pygame
 import numpy as np
 import random
-
-PIXEL_SIZE = 5
-ROCK_LEVEL = 5
 
 
 class Terrain(pygame.sprite.Sprite):

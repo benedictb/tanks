@@ -1,6 +1,6 @@
+from game.constants import *
 import pygame
 
-PARALLAX = 2
 
 # This turned out to be too slow to work, but it still worth including.
 # This class is a shifting background, which depends on the players movement.

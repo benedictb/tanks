@@ -2,6 +2,7 @@
 # Thomas Franceschi
 # Ben Becker
 
+from game.constants import *
 import numpy as np
 import pickle
 import random
@@ -22,15 +23,7 @@ from game.tank import MidTank
 from game.health import ErrorBars
 from game.wind import Wind
 
-FIRSTPORT = 50000
-TANKPORT = 50001
-BULLETPORT = 50002
-TERRAINPORT = 50003
 
-SERVER = 'localhost'
-
-PIXEL_SIZE = 5
-EXPLOSION_SIZE = 8*PIXEL_SIZE
 
 class GameSpace():
     def __init__(self, isServer=True):
@@ -69,7 +62,7 @@ class GameSpace():
         self.dot3 = myfont.render("Waiting for connection...", 1, self.white)
         self.clientmsg = myfont.render("Connection not found. If you're the client, "
                                        "make sure that the server is running and the port & address"
-                                       " are correct, and then restart.", 1, self.white)
+                                       " are correct, and then press restart ('r').", 1, self.white)
 
 
     def remove_blocks(self, x, y):

@@ -1,3 +1,4 @@
+from game.constants import *
 import pickle
 
 from twisted.internet.protocol import ClientFactory
@@ -8,12 +9,6 @@ from game.tank import MidTank
 from game.terrain import Terrain
 from game.health import ErrorBars
 from game.wind import Wind
-
-# Port Globals
-FIRSTPORT = 50000
-TANKPORT = 50001
-BULLETPORT = 50002
-TERRAINPORT = 50003
 
 
 # Connection to initiate client game objects

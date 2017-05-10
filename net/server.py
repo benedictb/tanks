@@ -1,3 +1,4 @@
+from game.constants import *
 import pickle
 
 from twisted.internet.protocol import Factory

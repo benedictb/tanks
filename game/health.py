@@ -1,8 +1,6 @@
+from game.constants import *
 import pygame
 
-BARWIDTH = 100
-BARHEIGHT = 25
-MAXHEALTH = 1000
 
 class ErrorBars(pygame.sprite.Sprite):
     def __init__(self, gs):
