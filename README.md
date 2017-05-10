@@ -1,14 +1,12 @@
 # TANKS
-Benedict Becker
-Thomas Franceschi
 
-**By Benedict Becker & Thomas Franceschi**
+*By Benedict Becker & Thomas Franceschi*
 
 ![TANKS](./media/mid_tank.png)
 
 
 
-##Networked tank game using the pygame and twisted python libraries.
+## Networked tank game using the pygame and twisted python libraries.
 
 ### Instructions
 To start a game, first make sure the 'SERVER' variable in tank_gs.py is set to the address of the computer the first
@@ -20,7 +18,6 @@ respectively. To fire missile, you aim your mouse at the angle you wish to fire 
 hit the opposing tank, they inflict 50 damage. When missiles hit the ground, they destroy a large chunk that is now
 traversable (Try digging a tunnel). Wind and gravity both affect the trajectory of the missiles and there is a wind
 indicator arrow in the upper right hand corner. When a player loses all of their health, the game will end and each
-<<<<<<< HEAD
 player's screen will display whether they won or lost, as well as a prompt to press 'q' to quit or 'r' to restart
 (only the server has the ability to start a new match).
 
