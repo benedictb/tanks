@@ -10,17 +10,15 @@ from game.mid_bullet import MidBullet
 class MidTank(pygame.sprite.Sprite):
     def __init__(self, gs, pos):
         super().__init__()
-        self.pos = np.asarray(pos)
+        self.pos = np.asarray(pos) # we use numpy for vector addition
         self.image = pygame.image.load('media/mid_tank.png')
         self.rect = self.image.get_rect()
         self.rect.centerx = pos[0]
         self.gs = gs
         self.vel = np.asarray([0, 0],dtype=np.float)
-        self.acc = GRAVITY
+        self.acc = GRAVITY # Constants are defined in game.constants.py
         self.health = MAXHEALTH
         self.bcount = 0
-
-        print(self.rect.size)
 
     def tick(self):
         # apply acceleration to velocity

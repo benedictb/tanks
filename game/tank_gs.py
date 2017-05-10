@@ -35,6 +35,7 @@ class GameSpace():
         self.screen = pygame.display.set_mode(self.size)
         self.clock = pygame.time.Clock()
 
+        # Initialize variables for the gamespace
         self.black = 0, 0, 0
         self.white = 255, 255, 255
         self.count = 0
@@ -45,7 +46,7 @@ class GameSpace():
         self.cont = False
 
 
-        # Sound init, music init
+        # Sound init, music init, pygame init
         pygame.mixer.pre_init(22100, -16, 1, 512)
         pygame.mixer.init()
         pygame.init()
@@ -65,6 +66,7 @@ class GameSpace():
                                        " are correct, and then press restart ('r').", 1, self.white)
 
 
+    # Removes blocks from both the gmap AND from the screen. Separate for time purposes
     def remove_blocks(self, x, y):
         self.remove_from_gmap(x - EXPLOSION_SIZE,
                                  x + EXPLOSION_SIZE,
@@ -76,6 +78,7 @@ class GameSpace():
                                       y - EXPLOSION_SIZE,
                                       y + EXPLOSION_SIZE)
 
+    # Get the lowest allowable pixel to the tank to be on
     def get_height(self, x):
         x = x % self.width
         col = [1 if i else 0 for i in self.gmap[x,:] ]
@@ -89,6 +92,7 @@ class GameSpace():
     def remove_from_gmap(self,x1,x2,y1,y2):
         self.gmap[x1:x2,y1:y2] = 0
 
+    # Simple main function that starts everything
     def main(self):
         # set up client and server respectively
         if self.isServer:
@@ -99,19 +103,20 @@ class GameSpace():
             self.create_client_connections()
             self.client_start()
 
-    # start game loop
+
+    # game loop called by LoopingCall
     def game_loop(self):
 
         # Make sure all connections have been made before starting
         if not self.run:
             self.loading_tick += 1
-            self.loading_screen()
+            self.loading_screen() # Print loading screen
             if all(self.connections):
                 self.run = True
 
             for event in pygame.event.get():
                 keys = pygame.key.get_pressed()
-                if keys[K_r]:
+                if keys[K_r]: # Restart the client connections
                     self.create_client_connections()
             return
 
@@ -119,56 +124,10 @@ class GameSpace():
 
         # if game is over (player dies) stop game, display winner/loser, prompt for quit or restart
         if self.game_over:
-            # if player1 (self) has health left when game ends, you win
-            if self.player1.health:
-                outcome = "Win!"
-            else:
-                outcome = "Lose!"
-
-            # display outcome
-            myfont = pygame.font.SysFont("monospace", 30)
-            gameover = myfont.render("You " + outcome + ": Press 'q' to quit, Server press 'r' to restart", 1, self.white)
-            self.screen.blit(gameover, (int(self.width / 2) - 350, int(self.height / 2)))
-            pygame.display.flip()
-
-            # if player hits 'q', stop reactor loop and program exits
-            if self.quit:
-                reactor.stop()
-
-            # if player hits 'r', restart game by resetting all objects and resend 'first connection' data
-            elif self.cont:
-                if self.isServer:
-                    self.restart_game()
-                    self.firstConnection.connectionMade()
-                    self.game_over = False
-                    self.cont = False
-                else:
-                    pass
+            self.endgame()
 
         # read user input
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                return 0
-
-            keys = pygame.key.get_pressed()
-            if keys[K_w]:
-                self.player1.vel[1] += 3
-            elif keys[K_a]:
-                self.player1.vel[0] = -1
-            elif keys[K_d]:
-                self.player1.vel[0] = 1
-            elif self.game_over and keys[K_q]:
-                self.quit = True
-            elif keys[K_r]:
-                self.cont = True
-            else:
-                self.player1.vel[0] = 0
-
-            if event.type == MOUSEBUTTONDOWN or event.type == K_DOWN:
-                mouse = pygame.mouse.get_pressed()
-                if mouse[0] or keys[K_SPACE]:
-                    self.launch.play()
-                    self.player1.launch()
+        self.process_events()
 
         # while the game is not over, continue sending tank data and updating the screen
         if not self.game_over:
@@ -192,6 +151,7 @@ class GameSpace():
 
             pygame.display.flip()
 
+    # Display the loading screen, separate for client, server
     def loading_screen(self):
         if self.isServer:
             self.screen.fill(self.black)
@@ -206,6 +166,7 @@ class GameSpace():
             self.screen.blit(self.clientmsg, (10,10))
         pygame.display.flip()
 
+    # This begins the reactor, this is where things halt
     def server_start(self):
         lc = LoopingCall(self.game_loop)
         lc.start(1/60).addErrback(twisted.python.log.err)
@@ -216,6 +177,7 @@ class GameSpace():
         lc.start(1/60).addErrback(twisted.python.log.err)
         reactor.run()
 
+    # Create the connections, or listen
     def create_client_connections(self):
         self.connections = [False] * 4
         self.firstConnection = reactor.connectTCP(SERVER, FIRSTPORT, client.FirstFactory(self))
@@ -248,3 +210,56 @@ class GameSpace():
         self.gameobjects.append(self.player1)
         self.gameobjects.append(self.player2)
         self.gameobjects.append(self.windarrow)
+
+    def endgame(self):
+        # if player1 (self) has health left when game ends, you win
+        if self.player1.health:
+            outcome = "Win!"
+        else:
+            outcome = "Lose!"
+
+        # display outcome
+        myfont = pygame.font.SysFont("monospace", 30)
+        gameover = myfont.render("You " + outcome + ": Press 'q' to quit, Server press 'r' to restart", 1, self.white)
+        self.screen.blit(gameover, (int(self.width / 2) - 350, int(self.height / 2)))
+        pygame.display.flip()
+
+        # if player hits 'q', stop reactor loop and program exits
+        if self.quit:
+            reactor.stop()
+
+        # if player hits 'r', restart game by resetting all objects and resend 'first connection' data
+        elif self.cont:
+            if self.isServer:
+                self.restart_game()
+                self.firstConnection.connectionMade()
+                self.game_over = False
+                self.cont = False
+            else:
+                pass
+
+    def process_events(self):
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                return 0
+
+            keys = pygame.key.get_pressed()
+            if keys[K_w]:
+                pass
+                # self.player1.vel[1] += 3
+            elif keys[K_a]:
+                self.player1.vel[0] = -1
+            elif keys[K_d]:
+                self.player1.vel[0] = 1
+            elif self.game_over and keys[K_q]:
+                self.quit = True
+            elif keys[K_r]:
+                self.cont = True
+            else:
+                self.player1.vel[0] = 0
+
+            if event.type == MOUSEBUTTONDOWN or event.type == K_DOWN:
+                mouse = pygame.mouse.get_pressed()
+                if mouse[0] or keys[K_SPACE]:
+                    self.launch.play()
+                    self.player1.launch()

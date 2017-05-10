@@ -90,7 +90,7 @@ class MidBullet(pygame.sprite.Sprite):
             if pygame.sprite.collide_rect(self, self.gs.player2) and self.isFiring:
                 print("HIT")
                 self.isFiring = False
-                self.gs.player2.health -= 50
+                self.gs.player2.health -= DAMAGE
                 print("Player Health: " + str(self.gs.player1.health))
                 print("Enemy Health: " + str(self.gs.player2.health))
                 print("~~~~~~~~~~~~~~~~~")
@@ -104,7 +104,7 @@ class MidBullet(pygame.sprite.Sprite):
             if pygame.sprite.collide_rect(self, self.gs.player1) and self.isFiring:
                 print("HIT")
                 self.isFiring = False
-                self.gs.player1.health -= 50
+                self.gs.player1.health -= DAMAGE
                 print("Player Health: " + str(self.gs.player1.health))
                 print("Enemy Health: " + str(self.gs.player2.health))
                 return 1

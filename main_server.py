@@ -1,4 +1,5 @@
 #! /usr/bin/python3
+
 from game.tank_gs import GameSpace
 
 if __name__ == '__main__':

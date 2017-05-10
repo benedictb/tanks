@@ -64,7 +64,6 @@ class Terrain(pygame.sprite.Sprite):
 
     def gen_terrain(self):
 
-        # Try generating a map, if it doesn't fit, try again (should'nt happen more than once, mayyybe twice 
         self.heights[0] = 100 # Left and right start the same way
         self.heights[-1] = 100
         length = int(self.screenWidth / PIXEL_SIZE)
@@ -86,6 +85,8 @@ class Terrain(pygame.sprite.Sprite):
         self.heights[mid] = int((self.heights[mid+1] + self.heights[mid-1]) / 2)
         return np.floor_divide(np.asarray(self.heights, dtype=int), PIXEL_SIZE).tolist()
 
+    # Generate the game terrain map matrix from a list of heights. This is a pixel mirror of the 
+    # terrain, which we need to delete individual pixels after explosions
     def gen_gmap(self, heights):
         try:
             # This is a map of the tiles
@@ -95,24 +96,21 @@ class Terrain(pygame.sprite.Sprite):
             # The next loops define which sort of tile they are (what color)
             for i, h in enumerate(self.heights):
                 i = i*5
-
                 for j in range(ROCK_LEVEL,h):
                     j = j*PIXEL_SIZE
-                    # gmap[i,j,0] = 1
                     gmap[i:i+PIXEL_SIZE,j:j+PIXEL_SIZE] = 2 #self.dirt
 
                 for j in range(0, ROCK_LEVEL + random.randint(0, 2)):
                     j = j*PIXEL_SIZE
-                    # gmap[i,j,0] = 1
                     gmap[i:i+PIXEL_SIZE, j:j+PIXEL_SIZE] = 1 #self.rock
 
                 for j in range(h - ROCK_LEVEL, h):
                     j = j*PIXEL_SIZE
-                    # gmap[i,j,0] = 1
                     gmap[i:i+PIXEL_SIZE, j:j+PIXEL_SIZE] = 3 #self.grass
 
             return gmap
         except IndexError:
+            # If the heights go above the screen, try again
             self.heights = self.gen_terrain()
             self.gen_gmap(self, self.heights)
 
