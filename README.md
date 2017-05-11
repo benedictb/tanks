@@ -22,7 +22,7 @@ player's screen will display whether they won or lost, as well as a prompt to pr
 (only the server has the ability to start a new match).
 
 ### A Note on Movement
-As of right now, the tanks will always be able to move right. Even if there is a wall blocking its path, it will suddenly 
+As of right now, the tanks will always be able to move left or right. Even if there is a wall blocking its path, it will suddenly 
 jump to the next highest ground. We left it this way because the highly interactive (destructive) environment would make for
 a lot of stuck tanks if we didn't include this movement workaround.
 
